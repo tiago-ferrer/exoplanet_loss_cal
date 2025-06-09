@@ -6,6 +6,7 @@ pandas>=1.3.0
 
 # API and web requests
 requests>=2.25.0
+pyvo>=1.4.0  # For accessing Virtual Observatory services
 
 # Web application
 flask>=2.0.0

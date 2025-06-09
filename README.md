@@ -64,6 +64,69 @@ print(f"Total mass loss: {results['total_mass_loss']} g")
 print(f"Total mass loss %: {results['total_mass_loss_percent']}%")
 ```
 
+### Exoplanet Data Cache
+
+The package includes a caching system for exoplanet data, which allows you to:
+- Store exoplanet data locally to reduce API calls
+- Add custom exoplanet data that might not be available in external databases
+- Manage the cache by listing, removing, or clearing entries
+
+#### Basic Cache Usage
+
+```python
+from exoplanet_loss.data.exoplanet import get_exoplanet_data
+
+# First call will fetch from API and cache the data
+data1 = get_exoplanet_data("Kepler", "7b")
+
+# Second call will retrieve from cache (faster, works offline)
+data2 = get_exoplanet_data("Kepler", "7b")
+```
+
+#### Adding Custom Data
+
+```python
+from exoplanet_loss.data.exoplanet import add_custom_exoplanet_data
+
+# Define custom exoplanet data
+custom_data = {
+    "Restrela": 0.9,  # Solar radii
+    "Mestrela": 0.8,  # Solar masses
+    "RplanetaEarth": 2.5,  # Earth radii
+    "MplanetaEarth": 10.0,  # Earth masses
+    "EixoMaiorPlaneta": 0.1,  # AU
+    "Excentricidade": 0.01,  # Eccentricity
+    "t_gyr": 5.0  # Gyr
+}
+
+# Add to cache
+add_custom_exoplanet_data("MyCustom", "Planet1", custom_data)
+
+# Now you can retrieve it like any other exoplanet
+data = get_exoplanet_data("MyCustom", "Planet1")
+```
+
+#### Managing the Cache
+
+```python
+from exoplanet_loss.data.exoplanet import (
+    list_cached_exoplanets,
+    remove_from_cache,
+    clear_cache
+)
+
+# List all exoplanets in the cache
+exoplanets = list_cached_exoplanets()
+for exoplanet in exoplanets:
+    print(f"- {exoplanet['full_name']}")
+
+# Remove a specific exoplanet from the cache
+removed = remove_from_cache("MyCustom", "Planet1")
+
+# Clear the entire cache
+clear_cache()
+```
+
 ### Web Application
 
 The package includes a web application that provides a user-friendly interface for performing calculations.
@@ -121,6 +184,7 @@ exoplanet_loss/
 - matplotlib
 - pandas
 - requests
+- pyvo (for accessing Virtual Observatory services)
 - flask (for web application)
 
 ## License
