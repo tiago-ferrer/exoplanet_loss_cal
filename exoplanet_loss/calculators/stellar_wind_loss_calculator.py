@@ -108,7 +108,7 @@ def parkers_equation(v, r, T, Mstar):
 
     return term1 - term2
 
-def solve_solar_wind_velocity_tracking(r_vals, T, v_initial_at_start, Mstar=1.989e33):
+def solve_solar_wind_velocity_tracking(r_vals, T, v_initial_at_start, Mstar):
     """
     Solve Parker's equation for a range of radial distances by tracking the solution.
 

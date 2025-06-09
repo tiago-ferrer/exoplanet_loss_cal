@@ -300,7 +300,7 @@ $(document).ready(function() {
                     tooltip: {
                         callbacks: {
                             title: function(context) {
-                                return `Distância: ${context[0].parsed.x.toExponential(2)} . 10⁶ km`;
+                                return `Distância: ${context[0].parsed.x.toExponential(2)} km`;
                             },
                             label: function(context) {
                                 return `Velocidade: ${context.parsed.y.toExponential(2)} m/s`;
