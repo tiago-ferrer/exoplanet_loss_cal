@@ -16,6 +16,40 @@ mp = 1.6726219e-27 * 1000  # proton mass [g]
 G = 6.67430e-8  # gravitational constant [cm^3 g^-1 s^-2]
 
 
+def generate_velocity_vs_distance_data(T_corona, Mstar, r_min=0.005, r_max=2.0, num_points=1000):
+    """
+    Generate data points for plotting stellar wind velocity vs distance.
+
+    Parameters:
+        T_corona (float): Coronal temperature [K]
+        Mstar (float): Stellar mass [g]
+        r_min (float): Minimum radius in AU
+        r_max (float): Maximum radius in AU
+        num_points (int): Number of data points to generate
+
+    Returns:
+        tuple: (distances, velocities) where:
+            - distances is a list of distances in cm
+            - velocities is a list of wind velocities in m/s
+    """
+    # Create array of distances in AU
+    r_au = np.linspace(r_min, r_max, num_points)
+
+    # Initial velocity guess
+    v_initial_at_start = 5e6  # 5 km/s in cm/s
+
+    # Calculate velocities at all radial distances
+    v_sw_values = solve_solar_wind_velocity_tracking(r_au, T_corona, v_initial_at_start, Mstar)
+
+    # Convert distances from AU to cm
+    distances_cm = r_au * AU
+
+    # Convert velocities from cm/s to m/s
+    velocities_ms = v_sw_values / 100.0
+
+    return distances_cm.tolist(), velocities_ms.tolist()
+
+
 
 def calcular_perda_de_massa_interacao_vento_solar(R_p, Mstar, T_corona, eixo_maior, p_w):
     """

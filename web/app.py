@@ -109,7 +109,8 @@ def calculate():
             "mass_loss_wind_percent": f"{results['mass_loss_wind_percent']:.2e}%",
             "total_mass_loss": f"{results['total_mass_loss']:.2e} g",
             "total_mass_loss_percent": f"{results['total_mass_loss_percent']:.2e}%",
-            "density_vs_distance": results['density_vs_distance']  # Pass the density vs distance data for plotting
+            "density_vs_distance": results['density_vs_distance'],  # Pass the density vs distance data for plotting
+            "velocity_vs_distance": results['velocity_vs_distance']  # Pass the velocity vs distance data for plotting
         }
 
         return jsonify({"success": True, "results": formatted_results})
