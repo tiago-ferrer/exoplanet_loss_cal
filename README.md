@@ -1,6 +1,6 @@
-# Materia - Exoplanet Mass Loss Calculator
+# Exoplanet Loss - Exoplanet Mass Loss Calculator
 
-Materia is a Python package for calculating mass loss in exoplanets due to photoevaporation and stellar wind interaction. It includes tools for retrieving exoplanet data from online databases and performing detailed calculations of mass loss rates.
+Exoplanet Loss is a Python package for calculating mass loss in exoplanets due to photoevaporation and stellar wind interaction. It includes tools for retrieving exoplanet data from online databases and performing detailed calculations of mass loss rates.
 
 ## Features
 
@@ -15,15 +15,14 @@ Materia is a Python package for calculating mass loss in exoplanets due to photo
 ### Using pip
 
 ```bash
-pip install materia
+pip install exoplanet_loss
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/yourusername/materia.git
-cd materia
-pip install -e .
+git clone https://github.com/tiago-ferrer/exoplanet_loss.git
+pip install -r requirements.txt
 ```
 
 ## Usage
@@ -31,8 +30,8 @@ pip install -e .
 ### Command Line
 
 ```python
-from materia.data.exoplanet import get_exoplanet_data
-from materia.calculador_final import calculate_mass_loss
+from exoplanet_loss.data.exoplanet import get_exoplanet_data
+from exoplanet_loss.calculador_final import calculate_mass_loss
 
 # Get data for Kepler 7b
 data = get_exoplanet_data("Kepler", "7b")
@@ -72,7 +71,7 @@ The package includes a web application that provides a user-friendly interface f
 To run the web application:
 
 ```bash
-cd materia_package/web
+cd exoplanet_loss_package/web
 flask run
 ```
 
@@ -81,7 +80,7 @@ Then open your browser and navigate to `http://127.0.0.1:5000/`.
 ## Package Structure
 
 ```
-materia/
+exoplanet_loss/
 ├── __init__.py
 ├── calculador_final.py
 ├── calculators/
