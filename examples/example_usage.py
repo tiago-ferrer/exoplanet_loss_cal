@@ -6,12 +6,17 @@ This script demonstrates how to use the package to calculate mass loss for exopl
 
 from exoplanet_loss.data.exoplanet import get_exoplanet_data
 from exoplanet_loss.calculador_final import calculate_mass_loss
+from exoplanet_loss.utils.logging import configure_logging, get_logger
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Configure logging
+configure_logging()
+logger = get_logger(__name__)
+
 def example_kepler_7b():
     """Example calculation for Kepler 7b."""
-    print("Example calculation for Kepler 7b:")
+    logger.info("Example calculation for Kepler 7b:")
 
     # Get data for Kepler 7b
     data = get_exoplanet_data("Kepler", "7b")
@@ -33,20 +38,20 @@ def example_kepler_7b():
     # Calculate mass loss
     results = calculate_mass_loss(star_data, planet_data)
 
-    # Print results
-    print("\nResults:")
-    print(f"Luminosity: {results['lx']:.2e} erg/s")
-    print(f"Coronal temperature: {results['t_cor']:.2f} K")
-    print(f"Mass loss photoev: {results['mass_loss_photoev']:.2e} g")
-    print(f"Mass loss photoev %: {results['mass_loss_photoev_percent']:.2e}%")
-    print(f"Mass loss wind: {results['mass_loss_wind']:.2e} g")
-    print(f"Mass loss wind %: {results['mass_loss_wind_percent']:.2e}%")
-    print(f"Total mass loss: {results['total_mass_loss']:.2e} g")
-    print(f"Total mass loss %: {results['total_mass_loss_percent']:.2e}%")
+    # Log results
+    logger.info("Results:")
+    logger.info(f"Luminosity: {results['lx']:.2e} erg/s")
+    logger.info(f"Coronal temperature: {results['t_cor']:.2f} K")
+    logger.info(f"Mass loss photoev: {results['mass_loss_photoev']:.2e} g")
+    logger.info(f"Mass loss photoev %: {results['mass_loss_photoev_percent']:.2e}%")
+    logger.info(f"Mass loss wind: {results['mass_loss_wind']:.2e} g")
+    logger.info(f"Mass loss wind %: {results['mass_loss_wind_percent']:.2e}%")
+    logger.info(f"Total mass loss: {results['total_mass_loss']:.2e} g")
+    logger.info(f"Total mass loss %: {results['total_mass_loss_percent']:.2e}%")
 
 def example_custom_planet():
     """Example calculation for a custom planet."""
-    print("\nExample calculation for a custom planet:")
+    logger.info("Example calculation for a custom planet:")
 
     # Define star data
     star_data = {
@@ -66,20 +71,20 @@ def example_custom_planet():
     # Calculate mass loss
     results = calculate_mass_loss(star_data, planet_data)
 
-    # Print results
-    print("\nResults:")
-    print(f"Luminosity: {results['lx']:.2e} erg/s")
-    print(f"Coronal temperature: {results['t_cor']:.2f} K")
-    print(f"Mass loss photoev: {results['mass_loss_photoev']:.2e} g")
-    print(f"Mass loss photoev %: {results['mass_loss_photoev_percent']:.6f}%")
-    print(f"Mass loss wind: {results['mass_loss_wind']:.2e} g")
-    print(f"Mass loss wind %: {results['mass_loss_wind_percent']:.6f}%")
-    print(f"Total mass loss: {results['total_mass_loss']:.2e} g")
-    print(f"Total mass loss %: {results['total_mass_loss_percent']:.6f}%")
+    # Log results
+    logger.info("Results:")
+    logger.info(f"Luminosity: {results['lx']:.2e} erg/s")
+    logger.info(f"Coronal temperature: {results['t_cor']:.2f} K")
+    logger.info(f"Mass loss photoev: {results['mass_loss_photoev']:.2e} g")
+    logger.info(f"Mass loss photoev %: {results['mass_loss_photoev_percent']:.6f}%")
+    logger.info(f"Mass loss wind: {results['mass_loss_wind']:.2e} g")
+    logger.info(f"Mass loss wind %: {results['mass_loss_wind_percent']:.6f}%")
+    logger.info(f"Total mass loss: {results['total_mass_loss']:.2e} g")
+    logger.info(f"Total mass loss %: {results['total_mass_loss_percent']:.6f}%")
 
 def example_plot_mass_loss_vs_distance():
     """Example plot of mass loss vs. distance."""
-    print("\nGenerating plot of mass loss vs. distance...")
+    logger.info("Generating plot of mass loss vs. distance...")
 
     # Define star data
     star_data = {
@@ -126,7 +131,7 @@ def example_plot_mass_loss_vs_distance():
     plt.grid(True)
 
     plt.savefig('mass_loss_vs_distance.png')
-    print("Plot saved as 'mass_loss_vs_distance.png'")
+    logger.info("Plot saved as 'mass_loss_vs_distance.png'")
 
 if __name__ == "__main__":
     example_kepler_7b()

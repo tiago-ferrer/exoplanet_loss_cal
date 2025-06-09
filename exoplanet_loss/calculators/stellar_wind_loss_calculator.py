@@ -3,6 +3,10 @@ import numpy as np
 from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
+from exoplanet_loss.utils.logging import get_logger
+
+# Get logger for this module
+logger = get_logger(__name__)
 
 
 # Constants
@@ -99,7 +103,7 @@ def solve_solar_wind_velocity_tracking(r_vals, T, v_initial_at_start, Mstar=1.98
             v_vals.append(v_solution)
         except Exception as e:
             # If fsolve fails to converge, append NaN or the last valid solution
-            print(f"Warning: fsolve failed to converge at r = {r} AU with initial guess v = {current_v_guess:.2e} cm/s. Error: {e}")
+            logger.warning(f"fsolve failed to converge at r = {r} AU with initial guess v = {current_v_guess:.2e} cm/s. Error: {e}")
             v_vals.append(np.nan) # Append NaN to indicate failure
 
     return np.array(v_vals)

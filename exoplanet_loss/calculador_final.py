@@ -2,6 +2,10 @@ from exoplanet_loss.calculators.densidade_wind_stellar import rho_w, generate_de
 from exoplanet_loss.calculators.lx_age_calculator import LxAgeCalculator
 from exoplanet_loss.calculators.photoevap_calculator import PhotoevaporationCalculator
 from exoplanet_loss.calculators.stellar_wind_loss_calculator import calcular_perda_de_massa_interacao_vento_solar
+from exoplanet_loss.utils.logging import get_logger
+
+# Get logger for this module
+logger = get_logger(__name__)
 
 # Constants
 Rsun = 6.957e10  # cm
@@ -108,15 +112,15 @@ def main():
 
     results = calculate_mass_loss(star_data, planet_data)
 
-    # Print results
-    print(f"Luminosity: {results['lx']} erg/s")
-    print(f"Coronal temperature: {results['t_cor']} K")
-    print(f"Mass loss photoev: {results['mass_loss_photoev']} g")
-    print(f"Mass loss photoev %: {results['mass_loss_photoev_percent']}%")
-    print(f"Mass loss wind: {results['mass_loss_wind']} g")
-    print(f"Mass loss wind %: {results['mass_loss_wind_percent']}%")
-    print(f"Total mass loss: {results['total_mass_loss']} g")
-    print(f"Total mass loss %: {results['total_mass_loss_percent']}%")
+    # Log results
+    logger.info(f"Luminosity: {results['lx']} erg/s")
+    logger.info(f"Coronal temperature: {results['t_cor']} K")
+    logger.info(f"Mass loss photoev: {results['mass_loss_photoev']} g")
+    logger.info(f"Mass loss photoev %: {results['mass_loss_photoev_percent']}%")
+    logger.info(f"Mass loss wind: {results['mass_loss_wind']} g")
+    logger.info(f"Mass loss wind %: {results['mass_loss_wind_percent']}%")
+    logger.info(f"Total mass loss: {results['total_mass_loss']} g")
+    logger.info(f"Total mass loss %: {results['total_mass_loss_percent']}%")
 
 if __name__ == "__main__":
     main()

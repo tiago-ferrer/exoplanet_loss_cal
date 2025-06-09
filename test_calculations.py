@@ -6,10 +6,15 @@ This script tests the main functionality of the package by calculating mass loss
 
 from exoplanet_loss.data.exoplanet import get_exoplanet_data
 from exoplanet_loss.calculador_final import calculate_mass_loss
+from exoplanet_loss.utils.logging import configure_logging, get_logger
+
+# Configure logging
+configure_logging()
+logger = get_logger(__name__)
 
 def test_kepler_7b():
     """Test calculations for Kepler 7b."""
-    print("Testing calculations for Kepler 7b...")
+    logger.info("Testing calculations for Kepler 7b...")
 
     # Get data for Kepler 7b
     data = get_exoplanet_data("Kepler", "7b")
@@ -31,18 +36,18 @@ def test_kepler_7b():
     # Calculate mass loss
     results = calculate_mass_loss(star_data, planet_data)
 
-    # Print results
-    print("\nResults:")
-    print(f"Luminosity: {results['lx']:.2e} erg/s")
-    print(f"Coronal temperature: {results['t_cor']:.2f} K")
-    print(f"Mass loss photoev: {results['mass_loss_photoev']:.2e} g")
-    print(f"Mass loss photoev %: {results['mass_loss_photoev_percent']:.6f}%")
-    print(f"Mass loss wind: {results['mass_loss_wind']:.2e} g")
-    print(f"Mass loss wind %: {results['mass_loss_wind_percent']:.6f}%")
-    print(f"Total mass loss: {results['total_mass_loss']:.2e} g")
-    print(f"Total mass loss %: {results['total_mass_loss_percent']:.6f}%")
+    # Log results
+    logger.info("Results:")
+    logger.info(f"Luminosity: {results['lx']:.2e} erg/s")
+    logger.info(f"Coronal temperature: {results['t_cor']:.2f} K")
+    logger.info(f"Mass loss photoev: {results['mass_loss_photoev']:.2e} g")
+    logger.info(f"Mass loss photoev %: {results['mass_loss_photoev_percent']:.6f}%")
+    logger.info(f"Mass loss wind: {results['mass_loss_wind']:.2e} g")
+    logger.info(f"Mass loss wind %: {results['mass_loss_wind_percent']:.6f}%")
+    logger.info(f"Total mass loss: {results['total_mass_loss']:.2e} g")
+    logger.info(f"Total mass loss %: {results['total_mass_loss_percent']:.6f}%")
 
-    print("\nTest completed successfully!")
+    logger.info("Test completed successfully!")
 
 if __name__ == "__main__":
     test_kepler_7b()

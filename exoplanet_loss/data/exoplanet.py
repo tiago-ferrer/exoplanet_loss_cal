@@ -1,6 +1,10 @@
 import requests
 import json
 import pandas as pd
+from exoplanet_loss.utils.logging import get_logger
+
+# Get logger for this module
+logger = get_logger(__name__)
 
 def get_exoplanet_data(star_name, planet_name):
     """
@@ -43,16 +47,18 @@ def get_exoplanet_data(star_name, planet_name):
         # First try NASA Exoplanet Archive
         try:
             data = query_nasa_archive(full_planet_name)
+            logger.info(f"Data found in NASA Exoplanet Archive for {full_planet_name} => {data}")
         except Exception as nasa_error:
-            print(f"NASA API error: {str(nasa_error)}. Falling back to exoplanet.eu")
+            logger.warning(f"NASA API error: {str(nasa_error)}. Falling back to exoplanet.eu")
             data = None
 
         # If NASA Archive doesn't have the data or failed, try exoplanet.eu
         if not data:
             data = query_exoplanet_eu(full_planet_name)
+            logger.info(f"Data found in exoplanet.eu for {full_planet_name} => {data}")
 
         if not data:
-            raise ValueError(f"Não foi possível encontrar dados para {full_planet_name} nenhuma das bases de dados disponíveis. Tente pela entrada manual.")
+            raise ValueError(f"Não foi possível encontrar dados para {full_planet_name} em nenhuma das bases de dados disponíveis. Tente pela entrada manual.")
 
         return data
 
@@ -159,17 +165,17 @@ def example_usage():
         # Example: Get data for Kepler 7b
         data = get_exoplanet_data("Kepler", "7b")
 
-        print("Exoplanet Data for Kepler 7b:")
-        print(f"Stellar Radius: {data['Restrela']} Rsun")
-        print(f"Stellar Mass: {data['Mestrela']} Msun")
-        print(f"Planet Radius: {data['RplanetaEarth']} Earth radii")
-        print(f"Planet Mass: {data['MplanetaEarth']} Earth masses")
-        print(f"Semi-major Axis: {data['EixoMaiorPlaneta']} AU")
-        print(f"Eccentricity: {data['Excentricidade']}")
-        print(f"Age: {data['t_gyr']} Gyr")
+        logger.info("Exoplanet Data for Kepler 7b:")
+        logger.info(f"Stellar Radius: {data['Restrela']} Rsun")
+        logger.info(f"Stellar Mass: {data['Mestrela']} Msun")
+        logger.info(f"Planet Radius: {data['RplanetaEarth']} Earth radii")
+        logger.info(f"Planet Mass: {data['MplanetaEarth']} Earth masses")
+        logger.info(f"Semi-major Axis: {data['EixoMaiorPlaneta']} AU")
+        logger.info(f"Eccentricity: {data['Excentricidade']}")
+        logger.info(f"Age: {data['t_gyr']} Gyr")
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        logger.error(f"Error: {str(e)}")
 
 if __name__ == "__main__":
     example_usage()
