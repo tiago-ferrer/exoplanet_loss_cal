@@ -41,14 +41,18 @@ def get_exoplanet_data(star_name, planet_name):
 
     try:
         # First try NASA Exoplanet Archive
-        data = query_nasa_archive(full_planet_name)
+        try:
+            data = query_nasa_archive(full_planet_name)
+        except Exception as nasa_error:
+            print(f"NASA API error: {str(nasa_error)}. Falling back to exoplanet.eu")
+            data = None
 
-        # If NASA Archive doesn't have the data, try exoplanet.eu
+        # If NASA Archive doesn't have the data or failed, try exoplanet.eu
         if not data:
             data = query_exoplanet_eu(full_planet_name)
 
         if not data:
-            raise ValueError(f"Não foi possível encontrar dados para {full_planet_name} nenhuma das bases de dados disponíveis.")
+            raise ValueError(f"Não foi possível encontrar dados para {full_planet_name} nenhuma das bases de dados disponíveis. Tente pela entrada manual.")
 
         return data
 
