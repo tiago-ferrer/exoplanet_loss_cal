@@ -1,7 +1,7 @@
-from materia.calculators.densidade_wind_stellar import rho_w
-from materia.calculators.lx_age_calculator import LxAgeCalculator
-from materia.calculators.photoevap_calculator import PhotoevaporationCalculator
-from materia.calculators.stellar_wind_loss_calculator import calcular_perda_de_massa_interacao_vento_solar
+from exoplanet_loss.calculators.densidade_wind_stellar import rho_w
+from exoplanet_loss.calculators.lx_age_calculator import LxAgeCalculator
+from exoplanet_loss.calculators.photoevap_calculator import PhotoevaporationCalculator
+from exoplanet_loss.calculators.stellar_wind_loss_calculator import calcular_perda_de_massa_interacao_vento_solar
 
 # Constants
 Rsun = 6.957e10  # cm
