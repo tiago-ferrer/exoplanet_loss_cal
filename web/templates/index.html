@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Perda de Massa de Exoplanetas</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Calculadora de Perda de Massa de Exoplanetas</h1>
+
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="inputTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button" role="tab" aria-controls="manual" aria-selected="true">Entrada Manual</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="api-tab" data-bs-toggle="tab" data-bs-target="#api" type="button" role="tab" aria-controls="api" aria-selected="false">Busca por API</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="inputTabsContent">
+                    <!-- Manual Input Form -->
+                    <div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+                        <form id="manualForm">
+                            <input type="hidden" name="use_api" value="false">
+
+                            <h4>Propriedades Estelares</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="stellar_radius" class="form-label">Raio Estelar (Rsol)</label>
+                                    <input type="number" class="form-control" id="stellar_radius" name="stellar_radius" step="0.01" required value="1.78">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="stellar_mass" class="form-label">Massa Estelar (Msol)</label>
+                                    <input type="number" class="form-control" id="stellar_mass" name="stellar_mass" step="0.01" required value="1.41">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="stellar_age" class="form-label">Idade Estelar (Gyr)</label>
+                                    <input type="number" class="form-control" id="stellar_age" name="stellar_age" step="0.1" required value="3.5">
+                                </div>
+                            </div>
+
+                            <h4>Propriedades do Planeta</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="planet_radius" class="form-label">Raio do Planeta (Rterra)</label>
+                                    <input type="number" class="form-control" id="planet_radius" name="planet_radius" step="0.01" required value="18.18">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="planet_mass" class="form-label">Massa do Planeta (Mterra)</label>
+                                    <input type="number" class="form-control" id="planet_mass" name="planet_mass" step="0.01" required value="140">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="semi_major_axis" class="form-label">Semi-eixo Maior (UA)</label>
+                                    <input type="number" class="form-control" id="semi_major_axis" name="semi_major_axis" step="0.00001" required value="0.06067">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="eccentricity" class="form-label">Excentricidade</label>
+                                    <input type="number" class="form-control" id="eccentricity" name="eccentricity" step="0.001" min="0" max="1" required value="0.026">
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Calcular Perda de Massa</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- API Lookup Form -->
+                    <div class="tab-pane fade" id="api" role="tabpanel" aria-labelledby="api-tab">
+                        <form id="apiForm">
+                            <input type="hidden" name="use_api" value="true">
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="star_name" class="form-label">Nome da Estrela</label>
+                                    <input type="text" class="form-control" id="star_name" name="star_name" required placeholder="ex., Kepler">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="planet_name" class="form-label">Nome/Designação do Planeta</label>
+                                    <input type="text" class="form-control" id="planet_name" name="planet_name" required placeholder="ex., 7b">
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Buscar e Calcular</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Card (initially hidden) -->
+        <div class="card mt-4" id="resultsCard" style="display: none;">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Resultados do Cálculo</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Propriedades Estelares</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td>Luminosidade em Raios-X:</td>
+                                <td id="result_lx"></td>
+                            </tr>
+                            <tr>
+                                <td>Temperatura Coronal:</td>
+                                <td id="result_t_cor"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Perda de Massa</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td>Fotoevaporação:</td>
+                                <td id="result_mass_loss_photoev"></td>
+                            </tr>
+                            <tr>
+                                <td>Fotoevaporação (%):</td>
+                                <td id="result_mass_loss_photoev_percent"></td>
+                            </tr>
+                            <tr>
+                                <td>Vento Estelar:</td>
+                                <td id="result_mass_loss_wind"></td>
+                            </tr>
+                            <tr>
+                                <td>Vento Estelar (%):</td>
+                                <td id="result_mass_loss_wind_percent"></td>
+                            </tr>
+                            <tr class="table-primary">
+                                <td><strong>Perda de Massa Total:</strong></td>
+                                <td id="result_total_mass_loss"></td>
+                            </tr>
+                            <tr class="table-primary">
+                                <td><strong>Perda de Massa Total (%):</strong></td>
+                                <td id="result_total_mass_loss_percent"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Alert (initially hidden) -->
+        <div class="alert alert-danger mt-4" id="errorAlert" style="display: none;">
+            <strong>Erro:</strong> <span id="errorMessage"></span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
