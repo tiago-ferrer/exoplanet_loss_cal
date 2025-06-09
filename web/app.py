@@ -127,4 +127,4 @@ def get_exoplanet(star_name, planet_name):
         return jsonify({"success": False, "error": translate_error(str(e))})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=10000)

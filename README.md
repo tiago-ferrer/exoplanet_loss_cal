@@ -79,7 +79,7 @@ cd web
 flask run
 ```
 
-Then open your browser and navigate to `http://127.0.0.1:5000/`.
+Then open your browser and navigate to `http://127.0.0.1:10000/`.
 
 ## Package Structure
 

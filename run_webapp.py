@@ -11,9 +11,9 @@ from web.app import app
 def main():
     """Run the web application."""
     print("Starting Exoplanet Loss web application...")
-    print("Open your browser and navigate to http://127.0.0.1:5000/")
+    print("Open your browser and navigate to http://127.0.0.1:10000/")
     print("Press Ctrl+C to stop the server.")
-    app.run(debug=False)
+    app.run(debug=False, port=10000)
 
 if __name__ == "__main__":
     # Ensure we're in the correct directory
