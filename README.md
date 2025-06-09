@@ -71,7 +71,11 @@ The package includes a web application that provides a user-friendly interface f
 To run the web application:
 
 ```bash
-cd exoplanet_loss_package/web
+# Option 1: Using the run_webapp.py script (recommended)
+python run_webapp.py
+
+# Option 2: Using Flask directly
+cd web
 flask run
 ```
 

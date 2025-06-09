@@ -1,3 +1,9 @@
+import os
+import sys
+
+# Add the project root directory to the Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from flask import Flask, render_template, request, jsonify
 from exoplanet_loss.data.exoplanet import get_exoplanet_data
 from exoplanet_loss.calculador_final import calculate_mass_loss
@@ -58,11 +64,11 @@ def calculate():
             "lx": f"{results['lx']:.2e} erg/s",
             "t_cor": f"{results['t_cor']:.2f} K",
             "mass_loss_photoev": f"{results['mass_loss_photoev']:.2e} g",
-            "mass_loss_photoev_percent": f"{results['mass_loss_photoev_percent']:.6f}%",
+            "mass_loss_photoev_percent": f"{results['mass_loss_photoev_percent']:.2e}%",
             "mass_loss_wind": f"{results['mass_loss_wind']:.2e} g",
-            "mass_loss_wind_percent": f"{results['mass_loss_wind_percent']:.6f}%",
+            "mass_loss_wind_percent": f"{results['mass_loss_wind_percent']:.2e}%",
             "total_mass_loss": f"{results['total_mass_loss']:.2e} g",
-            "total_mass_loss_percent": f"{results['total_mass_loss_percent']:.6f}%"
+            "total_mass_loss_percent": f"{results['total_mass_loss_percent']:.2e}%"
         }
 
         return jsonify({"success": True, "results": formatted_results})
