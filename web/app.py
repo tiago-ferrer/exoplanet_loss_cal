@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 
 # Add the project root directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -7,6 +8,45 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from flask import Flask, render_template, request, jsonify
 from exoplanet_loss.data.exoplanet import get_exoplanet_data
 from exoplanet_loss.calculador_final import calculate_mass_loss
+
+# Dictionary of common error messages and their Portuguese translations
+ERROR_TRANSLATIONS = {
+    # Exoplanet data errors
+    "Error connecting to exoplanet database": "Erro ao conectar ao banco de dados de exoplanetas",
+
+    # Input validation errors
+    "missing required key": "faltando chave obrigatória",
+    "is not a valid number": "não é um número válido",
+    "must be a positive number": "deve ser um número positivo",
+
+    # Generic errors
+    "An unexpected error occurred": "Ocorreu um erro inesperado",
+    "Invalid input": "Entrada inválida",
+    "Calculation error": "Erro de cálculo"
+}
+
+def translate_error(error_message):
+    """
+    Translate error messages from English to Portuguese.
+
+    Args:
+        error_message (str): The original error message in English
+
+    Returns:
+        str: The translated error message in Portuguese
+    """
+    # Check for exact matches first
+    if error_message in ERROR_TRANSLATIONS:
+        return ERROR_TRANSLATIONS[error_message]
+
+    # Check for partial matches
+    for eng, port in ERROR_TRANSLATIONS.items():
+        if eng in error_message:
+            # Replace the English part with the Portuguese translation
+            return error_message.replace(eng, port)
+
+    # If no match is found, return a generic error message
+    return "Ocorreu um erro: " + error_message
 
 app = Flask(__name__)
 
@@ -74,7 +114,7 @@ def calculate():
         return jsonify({"success": True, "results": formatted_results})
 
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+        return jsonify({"success": False, "error": translate_error(str(e))})
 
 @app.route('/api/exoplanet/<star_name>/<planet_name>')
 def get_exoplanet(star_name, planet_name):
@@ -83,7 +123,7 @@ def get_exoplanet(star_name, planet_name):
         data = get_exoplanet_data(star_name, planet_name)
         return jsonify({"success": True, "data": data})
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+        return jsonify({"success": False, "error": translate_error(str(e))})
 
 if __name__ == '__main__':
     app.run(debug=True)

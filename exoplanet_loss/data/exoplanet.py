@@ -48,7 +48,7 @@ def get_exoplanet_data(star_name, planet_name):
             data = query_exoplanet_eu(full_planet_name)
 
         if not data:
-            raise ValueError(f"Could not find data for {full_planet_name} in any of the available databases")
+            raise ValueError(f"Não foi possível encontrar dados para {full_planet_name} nenhuma das bases de dados disponíveis.")
 
         return data
 
