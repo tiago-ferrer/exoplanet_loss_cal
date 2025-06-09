@@ -81,6 +81,20 @@ flask run
 
 Then open your browser and navigate to `http://127.0.0.1:10000/`.
 
+### Deployment
+
+The application is configured to be deployable on cloud platforms like render.com. It will:
+
+- Listen on all network interfaces (0.0.0.0)
+- Use the PORT environment variable if it's set, otherwise default to port 10000
+
+To deploy on render.com:
+
+1. Create a new Web Service
+2. Connect your repository
+3. Set the build command: `pip install -r requirements.txt`
+4. Set the start command: `python run_webapp.py`
+
 ## Package Structure
 
 ```
