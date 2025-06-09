@@ -62,6 +62,11 @@ $(document).ready(function() {
         $('#result_total_mass_loss').text(results.total_mass_loss);
         $('#result_total_mass_loss_percent').text(results.total_mass_loss_percent);
 
+        // Create the density vs distance chart
+        if (results.density_vs_distance) {
+            createDensityDistanceChart(results.density_vs_distance);
+        }
+
         // Show results card
         $('#resultsCard').show();
 
@@ -69,5 +74,128 @@ $(document).ready(function() {
         $('html, body').animate({
             scrollTop: $('#resultsCard').offset().top - 20
         }, 500);
+    }
+
+    // Function to format numbers as "10ˣ" notation with superscript
+    function formatPowerOfTen(value) {
+        const exponent = Math.log10(Math.abs(value));
+
+        // Return empty string if exponent has decimal part
+        if (exponent % 1 !== 0) return '';
+
+        // Map of digits to superscript equivalents
+        const superscriptMap = {
+            '0': '⁰',
+            '1': '¹',
+            '2': '²',
+            '3': '³',
+            '4': '⁴',
+            '5': '⁵',
+            '6': '⁶',
+            '7': '⁷',
+            '8': '⁸',
+            '9': '⁹',
+            '-': '⁻'
+        };
+
+        // Convert exponent to superscript
+        const superscriptExponent = exponent.toString().split('').map(digit => superscriptMap[digit]).join('');
+
+        return `10${superscriptExponent}`;
+    }
+
+    // Function to create the density vs distance chart
+    function createDensityDistanceChart(data) {
+        const ctx = document.getElementById('densityDistanceChart').getContext('2d');
+
+        // Configuration for major tick intervals (change these values to control the interval)
+        const xAxisTickStep = 10; // Interval between major ticks on x-axis (in powers of 10)
+        const yAxisTickStep = 10; // Interval between major ticks on y-axis (in powers of 10)
+
+        // Destroy existing chart if it exists
+        if (window.densityChart) {
+            window.densityChart.destroy();
+        }
+
+        // Create new chart
+        window.densityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.distances,
+                datasets: [{
+                    label: 'Densidade do Vento Estelar (cm⁻³)',
+                    data: data.densities,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'logarithmic',
+                        title: {
+                            display: true,
+                            text: 'Distância (Rsol em cm)'
+                        },
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return formatPowerOfTen(value);
+                            },
+                            major: {
+                                enabled: true
+                            },
+                            minor: {
+                                enabled: false,
+                                display: false
+                            },
+                            // Only show major ticks of log function (powers of 10)
+                            filter: function(value, index, values) {
+                                // Check if the value is a power of 10 (10^n where n is an integer)
+                                return Math.log10(value) % 1 === 0;
+                            }
+                        }
+                    },
+                    y: {
+                        type: 'logarithmic',
+                        title: {
+                            display: true,
+                            text: 'Densidade (cm⁻³)'
+                        },
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return formatPowerOfTen(value);
+                            },
+                            major: {
+                                enabled: true
+                            },
+                            minor: {
+                                enabled: false,
+                                display: false
+                            },
+                            filter: function(value, index, values) {
+                                return Math.log10(value) % 1 === 0;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return `Distância: ${context[0].parsed.x.toExponential(2)} Rsol`;
+                            },
+                            label: function(context) {
+                                return `Densidade: ${context.parsed.y.toExponential(2)} cm⁻³`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 });

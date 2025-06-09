@@ -117,8 +117,8 @@ def get_interpolated_v_sw(Mstar, T_corona, eixo_maior):
         float - interpolated solar wind velocity [cm/s] at the target radius
     """
 
-    r_start = 0.005  # Starting distance in AU, needs to be small enough
-    r_end = 2.0  # Ending distance in AU
+    r_start = 0.005 * AU # Starting distance in AU, needs to be small enough
+    r_end = 2.0 * AU  # Ending distance in AU
     num_points = 500  # Increase points for smoother tracking
     r_au = np.linspace(r_start, r_end, num_points)
 
