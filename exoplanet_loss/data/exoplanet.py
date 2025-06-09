@@ -301,24 +301,28 @@ def query_nasa_archive(planet_name):
     # Make the request
     response = requests.get(base_url, params=params)
 
-    if response.status_code == 200:
-        results = response.json()
+    try:
+        if response.status_code == 200:
+            results = response.json()
 
-        if results and len(results) > 0:
-            planet_data = results[0]
+            if results and len(results) > 0:
+                planet_data = results[0]
 
-            # Extract and convert the data
-            return {
-                "Restrela": float(planet_data.get("st_rad", 0)),  # Solar radii
-                "Mestrela": float(planet_data.get("st_mass", 0)),  # Solar masses
-                "RplanetaEarth": float(planet_data.get("pl_rade", 0)),  # Earth radii
-                "MplanetaEarth": float(planet_data.get("pl_bmasse", 0)),  # Earth masses
-                "EixoMaiorPlaneta": float(planet_data.get("pl_orbsmax", 0)),  # AU
-                "Excentricidade": float(planet_data.get("pl_orbeccen", 0)),  # Eccentricity
-                "t_gyr": float(planet_data.get("st_age", 0))  # Gyr
-            }
+                # Extract and convert the data
+                return {
+                    "Restrela": float(planet_data.get("st_rad", 0)),  # Solar radii
+                    "Mestrela": float(planet_data.get("st_mass", 0)),  # Solar masses
+                    "RplanetaEarth": float(planet_data.get("pl_rade", 0)),  # Earth radii
+                    "MplanetaEarth": float(planet_data.get("pl_bmasse", 0)),  # Earth masses
+                    "EixoMaiorPlaneta": float(planet_data.get("pl_orbsmax", 0)),  # AU
+                    "Excentricidade": float(planet_data.get("pl_orbeccen", 0)),  # Eccentricity
+                    "t_gyr": float(planet_data.get("st_age", 0))  # Gyr
+                }
 
-    return None
+        return None
+    finally:
+        # Close the response to release the connection back to the pool
+        response.close()
 
 def query_exoplanet_eu(planet_name):
     """
@@ -411,36 +415,12 @@ def query_exoplanet_eu_fallback(planet_name):
     # Make the request for the specific planet
     response = requests.get(url)
 
-    if response.status_code == 200:
-        planet = response.json()
+    try:
+        if response.status_code == 200:
+            planet = response.json()
 
-        # Check if we got valid data
-        if planet and isinstance(planet, dict) and "name" in planet:
-            # Extract and convert the data
-            return {
-                "Restrela": float(planet.get("star_radius", 0)),  # Solar radii
-                "Mestrela": float(planet.get("star_mass", 0)),  # Solar masses
-                "RplanetaEarth": float(planet.get("radius", 0)) * 11.2,  # Convert from Jupiter to Earth radii
-                "MplanetaEarth": float(planet.get("mass", 0)) * 317.8,  # Convert from Jupiter to Earth masses
-                "EixoMaiorPlaneta": float(planet.get("semi_major_axis", 0)),  # AU
-                "Excentricidade": float(planet.get("eccentricity", 0)),  # Eccentricity
-                "t_gyr": float(planet.get("star_age", 0))  # Gyr
-            }
-
-    # If we get here, either the request failed or the planet wasn't found
-    # Try the alternative approach of getting all planets and filtering
-    logger.warning(f"Could not find {planet_name} using direct API call, trying alternative approach")
-
-    # Alternative approach: get all planets and filter
-    all_planets_url = "http://exoplanet.eu/api/exoplanet"
-    all_response = requests.get(all_planets_url)
-
-    if all_response.status_code == 200:
-        all_planets = all_response.json()
-
-        # Find the matching planet
-        for planet in all_planets:
-            if isinstance(planet, dict) and planet.get("name", "").lower() == planet_name.lower():
+            # Check if we got valid data
+            if planet and isinstance(planet, dict) and "name" in planet:
                 # Extract and convert the data
                 return {
                     "Restrela": float(planet.get("star_radius", 0)),  # Solar radii
@@ -451,6 +431,38 @@ def query_exoplanet_eu_fallback(planet_name):
                     "Excentricidade": float(planet.get("eccentricity", 0)),  # Eccentricity
                     "t_gyr": float(planet.get("star_age", 0))  # Gyr
                 }
+    finally:
+        # Close the response to release the connection back to the pool
+        response.close()
+
+    # If we get here, either the request failed or the planet wasn't found
+    # Try the alternative approach of getting all planets and filtering
+    logger.warning(f"Could not find {planet_name} using direct API call, trying alternative approach")
+
+    # Alternative approach: get all planets and filter
+    all_planets_url = "http://exoplanet.eu/api/exoplanet"
+    all_response = requests.get(all_planets_url)
+
+    try:
+        if all_response.status_code == 200:
+            all_planets = all_response.json()
+
+            # Find the matching planet
+            for planet in all_planets:
+                if isinstance(planet, dict) and planet.get("name", "").lower() == planet_name.lower():
+                    # Extract and convert the data
+                    return {
+                        "Restrela": float(planet.get("star_radius", 0)),  # Solar radii
+                        "Mestrela": float(planet.get("star_mass", 0)),  # Solar masses
+                        "RplanetaEarth": float(planet.get("radius", 0)) * 11.2,  # Convert from Jupiter to Earth radii
+                        "MplanetaEarth": float(planet.get("mass", 0)) * 317.8,  # Convert from Jupiter to Earth masses
+                        "EixoMaiorPlaneta": float(planet.get("semi_major_axis", 0)),  # AU
+                        "Excentricidade": float(planet.get("eccentricity", 0)),  # Eccentricity
+                        "t_gyr": float(planet.get("star_age", 0))  # Gyr
+                    }
+    finally:
+        # Close the response to release the connection back to the pool
+        all_response.close()
 
     return None
 
