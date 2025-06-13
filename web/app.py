@@ -1,11 +1,17 @@
 import os
 import sys
 import re
+import io
+import base64
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import matplotlib.pyplot as plt
 
 # Add the project root directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 from exoplanet_loss.data.exoplanet import get_exoplanet_data
 from exoplanet_loss.calculador_final import calculate_mass_loss
 
@@ -109,6 +115,7 @@ def calculate():
             "mass_loss_wind_percent": f"{results['mass_loss_wind_percent']:.2e}%",
             "total_mass_loss": f"{results['total_mass_loss']:.2e} g",
             "total_mass_loss_percent": f"{results['total_mass_loss_percent']:.2e}%",
+            "planet_distance": planet_data["EixoMaiorPlaneta"],  # Pass the planet's distance for reference lines
             "density_vs_distance": results['density_vs_distance'],  # Pass the density vs distance data for plotting
             "velocity_vs_distance": results['velocity_vs_distance']  # Pass the velocity vs distance data for plotting
         }
@@ -126,6 +133,76 @@ def get_exoplanet(star_name, planet_name):
         return jsonify({"success": True, "data": data})
     except Exception as e:
         return jsonify({"success": False, "error": translate_error(str(e))})
+
+@app.route('/export_chart', methods=['POST'])
+def export_chart():
+    """Export chart data as PNG using matplotlib."""
+    try:
+        # Get chart data from request
+        data = request.json
+        chart_type = data.get('chart_type')
+        x_data = data.get('x_data', [])
+        y_data = data.get('y_data', [])
+        x_label = data.get('x_label', '')
+        y_label = data.get('y_label', '')
+        title = data.get('title', '')
+        planet_distance = data.get('planet_distance')
+        planet_value = data.get('planet_value')
+        calculation_results = data.get('calculation_results', {})
+
+        # Create figure with specified size (8,4)
+        plt.figure(figsize=(8, 4))
+
+        # Create plot based on chart type
+        if chart_type == 'density':
+            # Logarithmic scale for density chart
+            plt.loglog(x_data, y_data)
+            plt.grid(True, which="both", ls="-")
+
+            # Add point at planet's distance if available
+            if planet_distance is not None and planet_value is not None:
+                plt.scatter([planet_distance], [planet_value], color='red', s=50, zorder=5)
+                # Add text annotation for the value
+                plt.annotate(f"Densidade: {planet_value:.2e} cm⁻³", 
+                             xy=(planet_distance, planet_value),
+                             xytext=(10, 10), textcoords='offset points',
+                             color='red', fontsize=9,
+                             bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="red", alpha=0.8))
+
+        elif chart_type == 'velocity':
+            # Linear scale for velocity chart
+            plt.plot(x_data, y_data)
+            plt.grid(True)
+
+            # Add point at planet's distance if available
+            if planet_distance is not None and planet_value is not None:
+                plt.scatter([planet_distance], [planet_value], color='red', s=50, zorder=5)
+                # Add text annotation for the value
+                plt.annotate(f"Velocidade: {planet_value:.2e} m/s", 
+                             xy=(planet_distance, planet_value),
+                             xytext=(10, 10), textcoords='offset points',
+                             color='red', fontsize=9,
+                             bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="red", alpha=0.8))
+
+        # Add labels and title
+        plt.xlabel(x_label)
+        plt.ylabel(y_label)
+        plt.title(title)
+
+        # Adjust layout first
+        plt.tight_layout()
+
+        # Save plot to a bytes buffer
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png', dpi=100)
+        buf.seek(0)
+        plt.close()
+
+        # Return the image as a response
+        return Response(buf.getvalue(), mimetype='image/png')
+
+    except Exception as e:
+        return jsonify({"success": False, "error": translate_error(str(e))}), 400
 
 if __name__ == '__main__':
     # Get port from environment variable or use default

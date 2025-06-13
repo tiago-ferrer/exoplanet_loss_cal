@@ -1,3 +1,6 @@
+// Store calculation results globally
+let calculationResults = null;
+
 $(document).ready(function() {
     // Handle manual form submission
     $('#manualForm').on('submit', function(e) {
@@ -9,6 +12,16 @@ $(document).ready(function() {
     $('#apiForm').on('submit', function(e) {
         e.preventDefault();
         submitForm($(this));
+    });
+
+    // Handle export velocity chart button click
+    $('#exportVelocityBtn').on('click', function() {
+        exportChart('velocity');
+    });
+
+    // Handle export density chart button click
+    $('#exportDensityBtn').on('click', function() {
+        exportChart('density');
     });
 
     // Function to submit form data
@@ -52,6 +65,9 @@ $(document).ready(function() {
 
     // Function to display results
     function displayResults(results) {
+        // Store results globally for use in export
+        calculationResults = results;
+
         // Populate result fields
         $('#result_lx').text(results.lx);
         $('#result_t_cor').text(results.t_cor);
@@ -64,12 +80,12 @@ $(document).ready(function() {
 
         // Create the density vs distance chart
         if (results.density_vs_distance) {
-            createDensityDistanceChart(results.density_vs_distance);
+            createDensityDistanceChart(results.density_vs_distance, results.planet_distance);
         }
 
         // Create the velocity vs distance chart
         if (results.velocity_vs_distance) {
-            createVelocityDistanceChart(results.velocity_vs_distance);
+            createVelocityDistanceChart(results.velocity_vs_distance, results.planet_distance);
         }
 
         // Show results card
@@ -139,7 +155,7 @@ $(document).ready(function() {
     }
 
     // Function to create the density vs distance chart
-    function createDensityDistanceChart(data) {
+    function createDensityDistanceChart(data, planetDistance) {
         const ctx = document.getElementById('densityDistanceChart').getContext('2d');
 
         // Configuration for major tick intervals (change these values to control the interval)
@@ -149,6 +165,23 @@ $(document).ready(function() {
         // Destroy existing chart if it exists
         if (window.densityChart) {
             window.densityChart.destroy();
+        }
+
+        // Convert planet distance from AU to solar radii (1 AU = 215 Rsol)
+        const planetDistanceRsol = planetDistance * 215;
+
+        // Find the y-value (density) at the planet's distance
+        let planetDensity = null;
+        let closestIndex = 0;
+        let minDistance = Number.MAX_VALUE;
+
+        for (let i = 0; i < data.distances.length; i++) {
+            const distance = Math.abs(data.distances[i] - planetDistanceRsol);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestIndex = i;
+                planetDensity = data.densities[i];
+            }
         }
 
         // Create new chart
@@ -164,6 +197,18 @@ $(document).ready(function() {
                     borderWidth: 2,
                     pointRadius: 0,
                     fill: false
+                },
+                {
+                    // Add a point at the planet's distance
+                    label: `Densidade na distância do planeta (${planetDistanceRsol.toExponential(2)} Rsol)`,
+                    data: [{x: planetDistanceRsol, y: planetDensity}],
+                    borderColor: 'rgba(255, 0, 0, 1)',
+                    backgroundColor: 'rgba(255, 0, 0, 1)',
+                    borderWidth: 2,
+                    pointRadius: 5,
+                    pointStyle: 'circle',
+                    fill: false,
+                    showLine: false
                 }]
             },
             options: {
@@ -174,7 +219,7 @@ $(document).ready(function() {
                         type: 'logarithmic',
                         title: {
                             display: true,
-                            text: 'Distância (Rsol em cm)'
+                            text: 'Distância (Rsol)'
                         },
                         ticks: {
                             callback: function(value, index, values) {
@@ -217,6 +262,46 @@ $(document).ready(function() {
                         }
                     }
                 },
+                annotation: {
+                    annotations: {
+                        line1: {
+                            type: 'line',
+                            xMin: planetDistanceRsol,
+                            xMax: planetDistanceRsol,
+                            borderColor: 'rgba(255, 0, 0, 0.5)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            label: {
+                                content: `Distância do planeta: ${planetDistanceRsol.toExponential(2)} Rsol`,
+                                enabled: true,
+                                position: 'top'
+                            }
+                        },
+                        line2: {
+                            type: 'line',
+                            yMin: planetDensity,
+                            yMax: planetDensity,
+                            borderColor: 'rgba(255, 0, 0, 0.5)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            label: {
+                                content: `Densidade: ${planetDensity.toExponential(2)} cm⁻³`,
+                                enabled: true,
+                                position: 'left'
+                            }
+                        },
+                        box1: {
+                            type: 'box',
+                            xMin: planetDistanceRsol * 0.9,
+                            xMax: planetDistanceRsol * 1.1,
+                            yMin: planetDensity * 0.9,
+                            yMax: planetDensity * 1.1,
+                            backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                            borderColor: 'rgba(255, 0, 0, 0.5)',
+                            borderWidth: 1
+                        }
+                    }
+                },
                 plugins: {
                     tooltip: {
                         callbacks: {
@@ -234,7 +319,7 @@ $(document).ready(function() {
     }
 
     // Function to create the velocity vs distance chart
-    function createVelocityDistanceChart(data) {
+    function createVelocityDistanceChart(data, planetDistance) {
         const ctx = document.getElementById('velocityDistanceChart').getContext('2d');
 
         // Configuration for major tick intervals (change these values to control the interval)
@@ -244,6 +329,23 @@ $(document).ready(function() {
         // Destroy existing chart if it exists
         if (window.velocityChart) {
             window.velocityChart.destroy();
+        }
+
+        // Convert planet distance from AU to km
+        const planetDistanceKm = planetDistance * 1.496e8; // 1 AU = 1.496e8 km
+
+        // Find the y-value (velocity) at the planet's distance
+        let planetVelocity = null;
+        let closestIndex = 0;
+        let minDistance = Number.MAX_VALUE;
+
+        for (let i = 0; i < data.distances.length; i++) {
+            const distance = Math.abs(data.distances[i] - planetDistanceKm);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestIndex = i;
+                planetVelocity = data.velocities[i];
+            }
         }
 
         // Create new chart
@@ -259,6 +361,18 @@ $(document).ready(function() {
                     borderWidth: 2,
                     pointRadius: 0,
                     fill: false
+                },
+                {
+                    // Add a point at the planet's distance
+                    label: `Velocidade na distância do planeta (${planetDistanceKm.toExponential(2)} km)`,
+                    data: [{x: planetDistanceKm, y: planetVelocity}],
+                    borderColor: 'rgba(255, 0, 0, 1)',
+                    backgroundColor: 'rgba(255, 0, 0, 1)',
+                    borderWidth: 2,
+                    pointRadius: 5,
+                    pointStyle: 'circle',
+                    fill: false,
+                    showLine: false
                 }]
             },
             options: {
@@ -309,6 +423,105 @@ $(document).ready(function() {
                     }
                 }
             }
+        });
+    }
+
+    // Function to export chart as PNG
+    function exportChart(chartType) {
+        let chart, title, xLabel, yLabel, planetDistance = null, planetValue = null;
+
+        // Get the appropriate chart and its configuration
+        if (chartType === 'velocity') {
+            if (!window.velocityChart) {
+                alert('Nenhum dado de gráfico disponível para exportar.');
+                return;
+            }
+            chart = window.velocityChart;
+            title = 'Velocidade do Vento Estelar vs Distância';
+            xLabel = 'Distância (km)';
+            yLabel = 'Velocidade do Vento Estelar (m/s)';
+
+            // Get planet distance and velocity from the second dataset
+            if (chart.data.datasets.length > 1 && chart.data.datasets[1].data.length > 0) {
+                planetDistance = chart.data.datasets[1].data[0].x;
+                planetValue = chart.data.datasets[1].data[0].y;
+            }
+        } else if (chartType === 'density') {
+            if (!window.densityChart) {
+                alert('Nenhum dado de gráfico disponível para exportar.');
+                return;
+            }
+            chart = window.densityChart;
+            title = 'Densidade do Vento Estelar vs Distância';
+            xLabel = 'Distância (Rsol)';
+            yLabel = 'Densidade (cm⁻³)';
+
+            // Get planet distance and density from the second dataset
+            if (chart.data.datasets.length > 1 && chart.data.datasets[1].data.length > 0) {
+                planetDistance = chart.data.datasets[1].data[0].x;
+                planetValue = chart.data.datasets[1].data[0].y;
+            }
+        } else {
+            alert('Tipo de gráfico inválido.');
+            return;
+        }
+
+        // Extract data from the chart
+        const xData = chart.data.labels;
+        const yData = chart.data.datasets[0].data;
+
+        // Show loading indicator on the button
+        const $btn = chartType === 'velocity' ? $('#exportVelocityBtn') : $('#exportDensityBtn');
+        const originalBtnText = $btn.html();
+        $btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Exportando...');
+        $btn.prop('disabled', true);
+
+        // Send data to server for export
+        fetch('/export_chart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chart_type: chartType,
+                x_data: xData,
+                y_data: yData,
+                x_label: xLabel,
+                y_label: yLabel,
+                title: title,
+                planet_distance: planetDistance,
+                planet_value: planetValue,
+                calculation_results: calculationResults // Include calculation results
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao exportar o gráfico');
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // Create a download link and trigger it
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `${chartType}_chart.png`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            // Reset button
+            $btn.html(originalBtnText);
+            $btn.prop('disabled', false);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Erro ao exportar o gráfico: ' + error.message);
+
+            // Reset button
+            $btn.html(originalBtnText);
+            $btn.prop('disabled', false);
         });
     }
 });

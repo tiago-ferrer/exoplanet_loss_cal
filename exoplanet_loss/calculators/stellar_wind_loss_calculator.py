@@ -156,7 +156,7 @@ def get_interpolated_v_sw(Mstar, T_corona, eixo_maior):
     """
 
     r_start = 0.005 * AU # Starting distance in AU, needs to be small enough
-    r_end = 2.0 * AU  # Ending distance in AU
+    r_end = 2.0 * eixo_maior * AU  # Ending distance in AU
     num_points = 500  # Increase points for smoother tracking
     r_au = np.linspace(r_start, r_end, num_points)
 
