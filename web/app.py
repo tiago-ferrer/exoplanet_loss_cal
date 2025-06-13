@@ -109,15 +109,16 @@ def calculate():
         formatted_results = {
             "lx": f"{results['lx']:.2e} erg/s",
             "t_cor": f"{results['t_cor']:.2f} K",
-            "mass_loss_photoev": f"{results['mass_loss_photoev']:.2e} g",
-            "mass_loss_photoev_percent": f"{results['mass_loss_photoev_percent']:.2e}%",
-            "mass_loss_wind": f"{results['mass_loss_wind']:.2e} g",
-            "mass_loss_wind_percent": f"{results['mass_loss_wind_percent']:.2e}%",
-            "total_mass_loss": f"{results['total_mass_loss']:.2e} g",
-            "total_mass_loss_percent": f"{results['total_mass_loss_percent']:.2e}%",
+            "mass_loss_photoev": f"{results['mass_loss_photoev']:.2e}",
+            "mass_loss_photoev_percent": f"{results['mass_loss_photoev_percent']:.2e}",
+            "mass_loss_wind": f"{results['mass_loss_wind']:.2e}",
+            "mass_loss_wind_percent": f"{results['mass_loss_wind_percent']:.2e}",
+            "total_mass_loss": f"{results['total_mass_loss']:.2e}",
+            "total_mass_loss_percent": f"{results['total_mass_loss_percent']:.2e}",
             "planet_distance": planet_data["EixoMaiorPlaneta"],  # Pass the planet's distance for reference lines
             "density_vs_distance": results['density_vs_distance'],  # Pass the density vs distance data for plotting
-            "velocity_vs_distance": results['velocity_vs_distance']  # Pass the velocity vs distance data for plotting
+            "velocity_vs_distance": results['velocity_vs_distance'],  # Pass the velocity vs distance data for plotting
+            "velicidade_vento_estelar": f"{results['velicidade_vento_estelar']:.2e}"
         }
 
         return jsonify({"success": True, "results": formatted_results})
@@ -148,7 +149,6 @@ def export_chart():
         title = data.get('title', '')
         planet_distance = data.get('planet_distance')
         planet_value = data.get('planet_value')
-        calculation_results = data.get('calculation_results', {})
 
         # Create figure with specified size (8,4)
         plt.figure(figsize=(8, 4))
@@ -178,7 +178,7 @@ def export_chart():
             if planet_distance is not None and planet_value is not None:
                 plt.scatter([planet_distance], [planet_value], color='red', s=50, zorder=5)
                 # Add text annotation for the value
-                plt.annotate(f"Velocidade: {planet_value:.2e} m/s", 
+                plt.annotate(f"Velocidade: {planet_value:.2e} km/s",
                              xy=(planet_distance, planet_value),
                              xytext=(10, 10), textcoords='offset points',
                              color='red', fontsize=9,

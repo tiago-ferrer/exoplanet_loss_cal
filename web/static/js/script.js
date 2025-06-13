@@ -77,6 +77,7 @@ $(document).ready(function() {
         $('#result_mass_loss_wind_percent').text(results.mass_loss_wind_percent);
         $('#result_total_mass_loss').text(results.total_mass_loss);
         $('#result_total_mass_loss_percent').text(results.total_mass_loss_percent);
+        $('#result_velocidade_vento_estelar').text(results.velicidade_vento_estelar)
 
         // Create the density vs distance chart
         if (results.density_vs_distance) {
@@ -85,7 +86,7 @@ $(document).ready(function() {
 
         // Create the velocity vs distance chart
         if (results.velocity_vs_distance) {
-            createVelocityDistanceChart(results.velocity_vs_distance, results.planet_distance);
+            createVelocityDistanceChart(results.velocity_vs_distance);
         }
 
         // Show results card
@@ -155,7 +156,7 @@ $(document).ready(function() {
     }
 
     // Function to create the density vs distance chart
-    function createDensityDistanceChart(data, planetDistance) {
+    function createDensityDistanceChart(data, planet_distance) {
         const ctx = document.getElementById('densityDistanceChart').getContext('2d');
 
         // Configuration for major tick intervals (change these values to control the interval)
@@ -168,7 +169,7 @@ $(document).ready(function() {
         }
 
         // Convert planet distance from AU to solar radii (1 AU = 215 Rsol)
-        const planetDistanceRsol = planetDistance * 215;
+        const planetDistanceRsol = planet_distance * 215;
 
         // Find the y-value (density) at the planet's distance
         let planetDensity = null;
@@ -200,7 +201,7 @@ $(document).ready(function() {
                 },
                 {
                     // Add a point at the planet's distance
-                    label: `Densidade na distância do planeta (${planetDistanceRsol.toExponential(2)} Rsol)`,
+                    label: `Densidade na distância do planeta (${planetDistanceRsol.toExponential(2)} cm-3)`,
                     data: [{x: planetDistanceRsol, y: planetDensity}],
                     borderColor: 'rgba(255, 0, 0, 1)',
                     backgroundColor: 'rgba(255, 0, 0, 1)',
@@ -319,7 +320,7 @@ $(document).ready(function() {
     }
 
     // Function to create the velocity vs distance chart
-    function createVelocityDistanceChart(data, planetDistance) {
+    function createVelocityDistanceChart(data) {
         const ctx = document.getElementById('velocityDistanceChart').getContext('2d');
 
         // Configuration for major tick intervals (change these values to control the interval)
@@ -329,23 +330,6 @@ $(document).ready(function() {
         // Destroy existing chart if it exists
         if (window.velocityChart) {
             window.velocityChart.destroy();
-        }
-
-        // Convert planet distance from AU to km
-        const planetDistanceKm = planetDistance * 1.496e8; // 1 AU = 1.496e8 km
-
-        // Find the y-value (velocity) at the planet's distance
-        let planetVelocity = null;
-        let closestIndex = 0;
-        let minDistance = Number.MAX_VALUE;
-
-        for (let i = 0; i < data.distances.length; i++) {
-            const distance = Math.abs(data.distances[i] - planetDistanceKm);
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestIndex = i;
-                planetVelocity = data.velocities[i];
-            }
         }
 
         // Create new chart
@@ -364,8 +348,8 @@ $(document).ready(function() {
                 },
                 {
                     // Add a point at the planet's distance
-                    label: `Velocidade na distância do planeta (${planetDistanceKm.toExponential(2)} km)`,
-                    data: [{x: planetDistanceKm, y: planetVelocity}],
+                    label: `Velocidade na distância do planeta (${data.velocity.toExponential(2)} km/s)`,
+                    data: [{x: data.distance, y: data.velocity}],
                     borderColor: 'rgba(255, 0, 0, 1)',
                     backgroundColor: 'rgba(255, 0, 0, 1)',
                     borderWidth: 2,
@@ -383,12 +367,12 @@ $(document).ready(function() {
                         type: 'linear',
                         title: {
                             display: true,
-                            text: 'Distância (km)'
+                            text: 'Distância (au)'
                         },
                         ticks: {
                             beginAtZero: true,
                             callback: function(value, index, values) {
-                                return formatPowerOfTenLinear(value);
+                                return value.toFixed(2);
                             },
                             major: {
                                 enabled: true
@@ -403,7 +387,7 @@ $(document).ready(function() {
                         type: 'linear',
                         title: {
                             display: true,
-                            text: 'Velocidade do Vento Estelar(m/s)'
+                            text: 'Velocidade do Vento Estelar(km/s)'
                         },
                         ticks: {
                             beginAtZero: true
@@ -414,10 +398,10 @@ $(document).ready(function() {
                     tooltip: {
                         callbacks: {
                             title: function(context) {
-                                return `Distância: ${context[0].parsed.x.toExponential(2)} km`;
+                                return `Distância: ${context[0].parsed.x.toExponential(2)} au`;
                             },
                             label: function(context) {
-                                return `Velocidade: ${context.parsed.y.toExponential(2)} m/s`;
+                                return `Velocidade: ${context.parsed.y.toExponential(2)} km/s`;
                             }
                         }
                     }
@@ -438,8 +422,8 @@ $(document).ready(function() {
             }
             chart = window.velocityChart;
             title = 'Velocidade do Vento Estelar vs Distância';
-            xLabel = 'Distância (km)';
-            yLabel = 'Velocidade do Vento Estelar (m/s)';
+            xLabel = 'Distância (au)';
+            yLabel = 'Velocidade do Vento Estelar (km/s)';
 
             // Get planet distance and velocity from the second dataset
             if (chart.data.datasets.length > 1 && chart.data.datasets[1].data.length > 0) {

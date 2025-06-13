@@ -1,7 +1,8 @@
 from exoplanet_loss.calculators.densidade_wind_stellar import rho_w, generate_density_vs_distance_data
 from exoplanet_loss.calculators.lx_age_calculator import LxAgeCalculator
 from exoplanet_loss.calculators.photoevap_calculator import PhotoevaporationCalculator
-from exoplanet_loss.calculators.stellar_wind_loss_calculator import calcular_perda_de_massa_interacao_vento_solar, generate_velocity_vs_distance_data
+from exoplanet_loss.calculators.stellar_wind_velocity_by_distance import generate_velocity_vs_distance_data
+from exoplanet_loss.calculators.txc_mass_loss_stellar_wind import calcular_taxa_perda_de_massa_interacao_vento_solar
 from exoplanet_loss.utils.logging import get_logger
 
 # Get logger for this module
@@ -9,7 +10,7 @@ logger = get_logger(__name__)
 
 # Constants
 Rsun = 6.957e10  # cm
-Msun = 1.98e31  # grams
+Msun = 1.98e30  # kg
 Rearth = 6.371e8  # cm
 Mearth = 5.97e27  # grams
 AU = 1.496e11 * 100  # 1 AU in cm
@@ -62,8 +63,13 @@ def calculate_mass_loss(star_data, planet_data):
 
     # Calculate mass loss due to stellar wind
     d_w = rho_w(Restrela * Rsun, t_gyr)
-    mLossWind = calcular_perda_de_massa_interacao_vento_solar(RplanetaEarth * Rearth, Mestrela * Msun, 
-                                                             t_cor, EixoMaiorPlaneta, d_w)
+
+    # Generate velocity vs distance data for plotting
+    r_min_au = 0.005  # Minimum radius in AU
+    vel_distances, velocities,veloc = generate_velocity_vs_distance_data(T_corona=t_cor, r_planeta_au=EixoMaiorPlaneta,
+                                                                 r_min_au=r_min_au, r_max_au=(EixoMaiorPlaneta*4),Mstar=Mestrela*Msun,num_points=1000)
+
+    mLossWind = calcular_taxa_perda_de_massa_interacao_vento_solar(RplanetaEarth * Rearth, d_w, veloc *1000)
     mLossWindPercent = (mLossWind * 100) / (MplanetaEarth * Mearth)
 
     # Calculate total mass loss
@@ -76,28 +82,26 @@ def calculate_mass_loss(star_data, planet_data):
     r_max_solar = 2 * AU /Rsun     # Convert from AU to solar radii
     distances, densities = generate_density_vs_distance_data(r_min=r_min_solar, r_max=r_max_solar, num_points=1000)
 
-    # Generate velocity vs distance data for plotting
-    r_min_au = 0.005  # Minimum radius in AU
-    r_max_au = 2.0    # Maximum radius in AU
-    vel_distances, velocities = generate_velocity_vs_distance_data(T_corona=t_cor, Mstar=Mestrela * Msun,
-                                                                 r_min=r_min_au*1e-5, r_max=(EixoMaiorPlaneta*AU*1.20)*1e-5, num_points=1000)
-
     # Return results
     return {
         "lx": lx,
         "t_cor": t_cor,
+        "velicidade_vento_estelar": veloc,
         "mass_loss_photoev": mLossPhoto,
         "mass_loss_photoev_percent": mLossPhotoPercent,
         "mass_loss_wind": mLossWind,
         "mass_loss_wind_percent": mLossWindPercent,
         "total_mass_loss": totalMassLoss,
         "total_mass_loss_percent": totalMassLossPercent,
+        "planet_distance": EixoMaiorPlaneta,
         "density_vs_distance": {
             "distances": distances,
             "densities": densities
         },
         "velocity_vs_distance": {
             "t_cor": t_cor,
+            "velocity":veloc,
+            "distance": EixoMaiorPlaneta,
             "distances": vel_distances,
             "velocities": velocities
         }
