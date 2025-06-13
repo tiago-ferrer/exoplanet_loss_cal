@@ -56,13 +56,14 @@ def calculate_mass_loss(star_data, planet_data):
     lx, t_cor = lx_age.getLx(), lx_age.getTCor()
 
     # Calculate mass loss due to photoevaporation
-    photoEvp = PhotoevaporationCalculator(0.3, lx, RplanetaEarth * Rearth, MplanetaEarth * Mearth, 
+    n=0.3
+    photoEvp = PhotoevaporationCalculator(n, lx, RplanetaEarth * Rearth, MplanetaEarth * Mearth,
                                          EixoMaiorPlaneta * AU, Excentricidade)
     mLossPhoto = photoEvp.get()
     mLossPhotoPercent = (mLossPhoto * 100) / (MplanetaEarth * Mearth)
 
     # Calculate mass loss due to stellar wind
-    d_w = rho_w(Restrela * Rsun, t_gyr)
+    d_w = rho_w(Restrela *AU/ Rsun, t_gyr)
 
     # Generate velocity vs distance data for plotting
     r_min_au = 0.005  # Minimum radius in AU
@@ -79,11 +80,13 @@ def calculate_mass_loss(star_data, planet_data):
     # Generate density vs distance data for plotting
     # Convert AU to solar radii (1 AU = 215 Rsun)
     r_min_solar = 0.005 * AU /Rsun  # Convert from AU to solar radii
-    r_max_solar = 2 * AU /Rsun     # Convert from AU to solar radii
+    r_max_solar = 1.5 * AU /Rsun     # Convert from AU to solar radii
     distances, densities = generate_density_vs_distance_data(r_min=r_min_solar, r_max=r_max_solar, num_points=1000)
 
     # Return results
     return {
+        "idade_estrela": t_gyr,
+        "fator_de_eficiencia": n,
         "lx": lx,
         "t_cor": t_cor,
         "velicidade_vento_estelar": veloc,
@@ -94,6 +97,7 @@ def calculate_mass_loss(star_data, planet_data):
         "total_mass_loss": totalMassLoss,
         "total_mass_loss_percent": totalMassLossPercent,
         "planet_distance": EixoMaiorPlaneta,
+        "densidade_vento_estelar": d_w,
         "density_vs_distance": {
             "distances": distances,
             "densities": densities

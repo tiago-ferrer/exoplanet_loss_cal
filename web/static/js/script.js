@@ -77,7 +77,10 @@ $(document).ready(function() {
         $('#result_mass_loss_wind_percent').text(results.mass_loss_wind_percent);
         $('#result_total_mass_loss').text(results.total_mass_loss);
         $('#result_total_mass_loss_percent').text(results.total_mass_loss_percent);
-        $('#result_velocidade_vento_estelar').text(results.velicidade_vento_estelar)
+        $('#result_velocidade_vento_estelar').text(results.velicidade_vento_estelar);
+        $('#result_densidade_vento_estelar').text(results.densidade_vento_estelar);
+        $('#result_fator_de_eficiencia').text(results.fator_de_eficiencia);
+        $('#result_idade_estrela').text(results.idade_estrela);
 
         // Create the density vs distance chart
         if (results.density_vs_distance) {
@@ -191,7 +194,7 @@ $(document).ready(function() {
             data: {
                 labels: data.distances,
                 datasets: [{
-                    label: 'Densidade do Vento Estelar (cm⁻³)',
+                    label: 'Densidade (cm⁻³)',
                     data: data.densities,
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -436,7 +439,7 @@ $(document).ready(function() {
                 return;
             }
             chart = window.densityChart;
-            title = 'Densidade do Vento Estelar vs Distância';
+            title = 'Densidade vs Distância';
             xLabel = 'Distância (Rsol)';
             yLabel = 'Densidade (cm⁻³)';
 

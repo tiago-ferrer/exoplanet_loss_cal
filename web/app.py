@@ -118,7 +118,10 @@ def calculate():
             "planet_distance": planet_data["EixoMaiorPlaneta"],  # Pass the planet's distance for reference lines
             "density_vs_distance": results['density_vs_distance'],  # Pass the density vs distance data for plotting
             "velocity_vs_distance": results['velocity_vs_distance'],  # Pass the velocity vs distance data for plotting
-            "velicidade_vento_estelar": f"{results['velicidade_vento_estelar']:.2e}"
+            "velicidade_vento_estelar": f"{results['velicidade_vento_estelar']:.2e}",
+            "densidade_vento_estelar": f"{results['densidade_vento_estelar']:.2e}",
+            "idade_estrela": results["idade_estrela"],
+            "fator_de_eficiencia":results["fator_de_eficiencia"]
         }
 
         return jsonify({"success": True, "results": formatted_results})

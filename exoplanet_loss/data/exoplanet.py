@@ -1,9 +1,10 @@
-import requests
 import json
-import pandas as pd
 import os
-import pathlib
+
 import pyvo
+import pyvo.dal.exceptions
+import requests
+
 from exoplanet_loss.utils.logging import get_logger
 
 # Get logger for this module
@@ -15,6 +16,7 @@ CACHE_FILE = os.path.join(CACHE_DIR, "exoplanet_cache.json")
 
 # Ensure cache directory exists
 os.makedirs(CACHE_DIR, exist_ok=True)
+
 
 def read_cache():
     """
@@ -32,6 +34,7 @@ def read_cache():
         logger.warning(f"Error reading cache file: {str(e)}. Starting with empty cache.")
         return {}
 
+
 def write_cache(cache_data):
     """
     Write exoplanet data to the cache file.
@@ -45,6 +48,7 @@ def write_cache(cache_data):
         logger.info(f"Cache updated successfully at {CACHE_FILE}")
     except Exception as e:
         logger.error(f"Error writing to cache file: {str(e)}")
+
 
 def get_from_cache(star_name, planet_name):
     """
@@ -61,6 +65,7 @@ def get_from_cache(star_name, planet_name):
     cache_key = f"{star_name.lower()}_{planet_name.lower()}"
     return cache.get(cache_key)
 
+
 def add_to_cache(star_name, planet_name, data):
     """
     Add exoplanet data to the cache.
@@ -74,6 +79,7 @@ def add_to_cache(star_name, planet_name, data):
     cache_key = f"{star_name.lower()}_{planet_name.lower()}"
     cache[cache_key] = data
     write_cache(cache)
+
 
 def add_custom_exoplanet_data(star_name, planet_name, data):
     """
@@ -102,7 +108,7 @@ def add_custom_exoplanet_data(star_name, planet_name, data):
     """
     # Required fields
     required_fields = [
-        "Restrela", "Mestrela", "RplanetaEarth", "MplanetaEarth", 
+        "Restrela", "Mestrela", "RplanetaEarth", "MplanetaEarth",
         "EixoMaiorPlaneta", "Excentricidade", "t_gyr"
     ]
 
@@ -116,6 +122,7 @@ def add_custom_exoplanet_data(star_name, planet_name, data):
     logger.info(f"Custom data for {star_name} {planet_name} added to cache")
 
     return data
+
 
 def list_cached_exoplanets():
     """
@@ -145,6 +152,7 @@ def list_cached_exoplanets():
 
     return exoplanets
 
+
 def remove_from_cache(star_name, planet_name):
     """
     Remove an exoplanet from the cache.
@@ -168,6 +176,7 @@ def remove_from_cache(star_name, planet_name):
         logger.warning(f"{star_name} {planet_name} not found in cache")
         return False
 
+
 def clear_cache():
     """
     Clear the entire exoplanet data cache.
@@ -183,6 +192,7 @@ def clear_cache():
     except Exception as e:
         logger.error(f"Error clearing cache: {str(e)}")
         return False
+
 
 def get_exoplanet_data(star_name, planet_name):
     """
@@ -251,17 +261,26 @@ def get_exoplanet_data(star_name, planet_name):
                     # Add to cache for future use
                     add_to_cache(star_name, planet_name, data)
                 else:
-                    logger.warning(f"Data not found in exoplanet.eu in {full_planet_name} either in NASA Exoplanet Archive. Try manual input.")
+                    logger.warning(
+                        f"Data not found in exoplanet.eu in {full_planet_name} either in NASA Exoplanet Archive. Try manual input.")
             except Exception as eu_error:
                 logger.error(f"exoplanet.eu API error: {str(eu_error)}.")
 
         if not data:
-            raise ValueError(f"Não foi possível encontrar dados para {full_planet_name} em nenhuma das bases de dados disponíveis. Tente pela entrada manual.")
+            raise ValueError(
+                f"Não foi possível encontrar dados para {full_planet_name} em nenhuma das bases de dados disponíveis. Tente pela entrada manual.")
 
         return data
 
+    except requests.exceptions.Timeout as e:
+        raise ConnectionError(
+            f"Timeout while connecting to exoplanet database: {str(e)}. Try again later or use manual input.")
+    except requests.exceptions.ConnectionError as e:
+        raise ConnectionError(
+            f"Connection error while accessing exoplanet database: {str(e)}. Check your internet connection or try again later.")
     except requests.exceptions.RequestException as e:
         raise ConnectionError(f"Error connecting to exoplanet database: {str(e)}")
+
 
 def query_nasa_archive(planet_name):
     """
@@ -278,9 +297,9 @@ def query_nasa_archive(planet_name):
 
     # Columns to retrieve
     columns = [
-        "pl_name", "hostname", 
+        "pl_name", "hostname",
         "st_rad", "st_mass", "st_age",
-        "pl_rade", "pl_bmasse", 
+        "pl_rade", "pl_bmasse",
         "pl_orbsmax", "pl_orbeccen"
     ]
 
@@ -298,8 +317,8 @@ def query_nasa_archive(planet_name):
         "format": "json"
     }
 
-    # Make the request
-    response = requests.get(base_url, params=params)
+    # Make the request with timeout
+    response = requests.get(base_url, params=params, timeout=(10, 30))  # (connect timeout, read timeout)
 
     try:
         if response.status_code == 200:
@@ -324,6 +343,7 @@ def query_nasa_archive(planet_name):
         # Close the response to release the connection back to the pool
         response.close()
 
+
 def query_exoplanet_eu(planet_name):
     """
     Query the Exoplanet.eu database for planet data using pyvo and TAP service.
@@ -335,8 +355,15 @@ def query_exoplanet_eu(planet_name):
         dict: Dictionary with exoplanet data or None if not found
     """
     try:
-        # Connect to the TAP service
-        tap_service = pyvo.dal.TAPService("http://voparis-tap-planeto.obspm.fr/tap")
+        # Connect to the TAP service with a timeout
+        tap_url = "http://voparis-tap-planeto.obspm.fr/tap"
+        session = requests.Session()
+        session.mount('http://', requests.adapters.HTTPAdapter(max_retries=1))
+        session.mount('https://', requests.adapters.HTTPAdapter(max_retries=1))
+        tap_service = pyvo.dal.TAPService(tap_url, session=session)
+
+        # Set a timeout for the session
+        session.timeout = (10, 30)  # (connect timeout, read timeout)
 
         # Prepare the query
         # Split the planet name to get star name and planet designation
@@ -365,9 +392,9 @@ def query_exoplanet_eu(planet_name):
               (p.star_name LIKE '%{star_name}%' AND p.target_name LIKE '%{planet_designation}%')
         """
 
-        # Execute the query
+        # Execute the query with a timeout to prevent hanging
         logger.info(f"Executing TAP query for planet: {planet_name}")
-        results = tap_service.search(query)
+        results = tap_service.search(query, timeout=30)  # 30 seconds timeout
 
         # Check if we got results
         if len(results) == 0:
@@ -388,12 +415,27 @@ def query_exoplanet_eu(planet_name):
             "Excentricidade": float(planet.get("eccentricity", 0)),  # Eccentricity
             "t_gyr": float(planet.get("star_age", 0))  # Gyr
         }
-    except Exception as e:
-        logger.error(f"Error querying exoplanet.eu TAP service: {str(e)}")
-
-        # Fall back to the old API method if TAP service fails
+    except pyvo.dal.exceptions.DALQueryError as e:
+        logger.error(f"TAP query error for planet {planet_name}: {str(e)}")
         logger.warning("Falling back to the old API method")
         return query_exoplanet_eu_fallback(planet_name)
+    except pyvo.dal.exceptions.DALServiceError as e:
+        logger.error(f"TAP service error for planet {planet_name}: {str(e)}")
+        logger.warning("Falling back to the old API method")
+        return query_exoplanet_eu_fallback(planet_name)
+    except requests.exceptions.Timeout:
+        logger.error(f"Timeout while querying TAP service for planet {planet_name}")
+        logger.warning("Falling back to the old API method due to timeout")
+        return query_exoplanet_eu_fallback(planet_name)
+    except requests.exceptions.ConnectionError:
+        logger.error(f"Connection error while querying TAP service for planet {planet_name}")
+        logger.warning("Falling back to the old API method due to connection error")
+        return query_exoplanet_eu_fallback(planet_name)
+    except Exception as e:
+        logger.error(f"Unexpected error querying exoplanet.eu TAP service for planet {planet_name}: {str(e)}")
+        logger.warning("Falling back to the old API method")
+        return query_exoplanet_eu_fallback(planet_name)
+
 
 def query_exoplanet_eu_fallback(planet_name):
     """
@@ -412,8 +454,8 @@ def query_exoplanet_eu_fallback(planet_name):
     # Construct the URL with the planet name as a parameter
     url = f"{base_url}/{planet_name.lower().replace(' ', '_')}"
 
-    # Make the request for the specific planet
-    response = requests.get(url)
+    # Make the request for the specific planet with timeout
+    response = requests.get(url, timeout=(10, 30))  # (connect timeout, read timeout)
 
     try:
         if response.status_code == 200:
@@ -439,9 +481,9 @@ def query_exoplanet_eu_fallback(planet_name):
     # Try the alternative approach of getting all planets and filtering
     logger.warning(f"Could not find {planet_name} using direct API call, trying alternative approach")
 
-    # Alternative approach: get all planets and filter
+    # Alternative approach: get all planets and filter with timeout
     all_planets_url = "http://exoplanet.eu/api/exoplanet"
-    all_response = requests.get(all_planets_url)
+    all_response = requests.get(all_planets_url, timeout=(10, 30))  # (connect timeout, read timeout)
 
     try:
         if all_response.status_code == 200:
@@ -465,6 +507,7 @@ def query_exoplanet_eu_fallback(planet_name):
         all_response.close()
 
     return None
+
 
 def example_usage():
     """
@@ -526,6 +569,7 @@ def example_usage():
 
     except Exception as e:
         logger.error(f"Error: {str(e)}")
+
 
 if __name__ == "__main__":
     example_usage()
