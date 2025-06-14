@@ -1,5 +1,5 @@
 from exoplanet_loss.calculators.densidade_wind_stellar import rho_w, generate_density_vs_distance_data
-from exoplanet_loss.calculators.lx_age_calculator import LxAgeCalculator
+from exoplanet_loss.calculators.lx_age_calculator import LxAgeFxCalculator
 from exoplanet_loss.calculators.photoevap_calculator import PhotoevaporationCalculator
 from exoplanet_loss.calculators.stellar_wind_velocity_by_distance import generate_velocity_vs_distance_data
 from exoplanet_loss.calculators.txc_mass_loss_stellar_wind import calcular_taxa_perda_de_massa_interacao_vento_solar
@@ -54,8 +54,8 @@ def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3, initial_v
     Excentricidade = planet_data["Excentricidade"]  # Eccentricity
 
     # Calculate X-ray luminosity and coronal temperature
-    lx_age = LxAgeCalculator(t_gyr, Restrela * Rsun)
-    lx, t_cor = lx_age.getLx(), lx_age.getTCor()
+    lx_age_fx = LxAgeFxCalculator(t_gyr, Restrela * Rsun)
+    lx, t_cor,fx = lx_age_fx.getLx(), lx_age_fx.getTCor(),lx_age_fx.fx
 
     # Calculate mass loss due to photoevaporation
     n = efficiency_factor
@@ -94,6 +94,7 @@ def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3, initial_v
         "velocidade_inicial": initial_velocity,
         "lx": lx,
         "t_cor": t_cor,
+        "fx":fx,
         "velicidade_vento_estelar": veloc,
         "mass_loss_photoev": mLossPhoto,
         "mass_loss_photoev_percent": mLossPhotoPercent,

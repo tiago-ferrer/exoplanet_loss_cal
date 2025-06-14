@@ -1,10 +1,9 @@
+import io
 import os
 import sys
-import re
-import io
-import base64
-import numpy as np
+
 import matplotlib
+
 matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 
@@ -31,6 +30,7 @@ ERROR_TRANSLATIONS = {
     "Calculation error": "Erro de cálculo"
 }
 
+
 def translate_error(error_message):
     """
     Translate error messages from English to Portuguese.
@@ -54,12 +54,15 @@ def translate_error(error_message):
     # If no match is found, return a generic error message
     return "Ocorreu um erro: " + error_message
 
+
 app = Flask(__name__)
+
 
 @app.route('/')
 def index():
     """Render the main page."""
     return render_template('index.html')
+
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
@@ -111,8 +114,15 @@ def calculate():
 
         # Format results for display
         formatted_results = {
-            "lx": f"{results['lx']:.2e} erg/s",
-            "t_cor": f"{results['t_cor']:.2f} K",
+            "r_estelar_rsol": f"{star_data['Restrela']} Rsol",
+            "massa_estrela_msol": f"{star_data['Mestrela']} Msol",
+            "r_planeta_rterra": f"{planet_data['RplanetaEarth']:.2f} Rterra",
+            "m_planeta_mterra": f"{planet_data['MplanetaEarth']:.2f} Mterra",
+            "semi_eixo": f"{planet_data['EixoMaiorPlaneta']} ua",
+            "planeta_excentricidade": planet_data["Excentricidade"],
+            "lx": f"{results['lx']:.2e} erg s−1",
+            "t_cor": f"{results['t_cor'] / 1e6:.2f} MK",
+            "fx": f"{results['fx']:.2e} erg s−1 cm−3",
             "mass_loss_photoev": f"{results['mass_loss_photoev']:.2e}",
             "mass_loss_photoev_percent": f"{results['mass_loss_photoev_percent']:.2e}",
             "mass_loss_wind": f"{results['mass_loss_wind']:.2e}",
@@ -122,17 +132,18 @@ def calculate():
             "planet_distance": planet_data["EixoMaiorPlaneta"],  # Pass the planet's distance for reference lines
             "density_vs_distance": results['density_vs_distance'],  # Pass the density vs distance data for plotting
             "velocity_vs_distance": results['velocity_vs_distance'],  # Pass the velocity vs distance data for plotting
-            "velicidade_vento_estelar": f"{results['velicidade_vento_estelar']:.2e}",
-            "densidade_vento_estelar": f"{results['densidade_vento_estelar']:.2e}",
-            "idade_estrela": results["idade_estrela"],
+            "velicidade_vento_estelar": f"{results['velicidade_vento_estelar']:.2e} km/s",
+            "densidade_vento_estelar": f"{results['densidade_vento_estelar']:.2e} g/s",
+            "idade_estrela": f"{results['idade_estrela']} Gyr",
             "fator_de_eficiencia": results["fator_de_eficiencia"],
-            "velocidade_inicial": results["velocidade_inicial"]
+            "velocidade_inicial": f"{results['velocidade_inicial'] / 1000} km/s"
         }
 
         return jsonify({"success": True, "results": formatted_results})
 
     except Exception as e:
         return jsonify({"success": False, "error": translate_error(str(e))})
+
 
 @app.route('/api/exoplanet/<star_name>/<planet_name>')
 def get_exoplanet(star_name, planet_name):
@@ -142,6 +153,7 @@ def get_exoplanet(star_name, planet_name):
         return jsonify({"success": True, "data": data})
     except Exception as e:
         return jsonify({"success": False, "error": translate_error(str(e))})
+
 
 @app.route('/export_chart', methods=['POST'])
 def export_chart():
@@ -171,7 +183,7 @@ def export_chart():
             if planet_distance is not None and planet_value is not None:
                 plt.scatter([planet_distance], [planet_value], color='red', s=50, zorder=5)
                 # Add text annotation for the value
-                plt.annotate(f"Densidade: {planet_value:.2e} cm⁻³", 
+                plt.annotate(f"Densidade: {planet_value:.2e} cm⁻³",
                              xy=(planet_distance, planet_value),
                              xytext=(10, 10), textcoords='offset points',
                              color='red', fontsize=9,
@@ -211,6 +223,7 @@ def export_chart():
 
     except Exception as e:
         return jsonify({"success": False, "error": translate_error(str(e))}), 400
+
 
 if __name__ == '__main__':
     # Get port from environment variable or use default

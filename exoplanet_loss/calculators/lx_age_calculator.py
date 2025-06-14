@@ -3,15 +3,19 @@ import numpy as np
 # Constants from the fit in Lx_versus_age.ipynb
 A_FIT = 6.76e27  # Coefficient A in the power-law fit
 B_FIT = -1.92    # Exponent b in the power-law fit
-class LxAgeCalculator:
+class LxAgeFxCalculator:
     def __init__(self, age, raio_estrela):
         self.age = age
         self.raio_estrela = raio_estrela
+        self.lx = calculate_xray_luminosity(self.age)
+        self.t_cor,self.fx =calculate_coronal_temperature_and_fx(self.lx, self.raio_estrela)
 
     def getLx(self):
-        return calculate_xray_luminosity(self.age)
+        return self.lx
     def getTCor(self):
-        return calculate_coronal_temperature(self.getLx(),self.raio_estrela)
+        return self.t_cor
+    def getFx(self):
+        return self.fx
 
 
 def calculate_xray_luminosity(age_gyr):
@@ -38,7 +42,7 @@ def calculate_xray_luminosity(age_gyr):
     """
     return A_FIT * np.power(age_gyr, B_FIT)
 
-def calculate_coronal_temperature(lx, radius):
+def calculate_coronal_temperature_and_fx(lx, radius):
     """
     Calculate coronal temperature based on X-ray luminosity and stellar radius.
     
@@ -68,7 +72,7 @@ def calculate_coronal_temperature(lx, radius):
     # Calculate coronal temperature
     t_cor = 0.11 * np.power(fx, 0.26) * 1e6
     
-    return t_cor
+    return t_cor, fx
 
 def plot_lx_vs_age(age_min=0.1, age_max=10.0, num_points=100):
     """
@@ -108,7 +112,7 @@ def plot_lx_vs_age(age_min=0.1, age_max=10.0, num_points=100):
     
     return fig, ax
 
-def get_lx_Tcor(age):
+def get_lx_Tcor_fx(age):
     lx = calculate_xray_luminosity(age)
-    t_cor = calculate_coronal_temperature(lx)
-    return lx, t_cor
+    t_cor,fx = calculate_coronal_temperature_and_fx(lx)
+    return lx, t_cor,fx

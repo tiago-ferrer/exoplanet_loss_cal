@@ -82,15 +82,20 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label for="efficiency_factor" class="form-label">Fator de Eficiência</label>
-                                <input type="number" class="form-control" id="efficiency_factor" name="efficiency_factor"
+                                <input type="number" class="form-control" id="efficiency_factor"
+                                       name="efficiency_factor"
                                        step="0.01" min="0" max="1" required value="0.3">
-                                <div class="form-text">Valor entre 0 e 1 que representa a eficiência da fotoevaporação.</div>
+                                <div class="form-text">Valor entre 0 e 1 que representa a eficiência da
+                                    fotoevaporação.
+                                </div>
                             </div>
                             <div class="col-md-4">
-                                <label for="initial_velocity" class="form-label">Velocidade Inicial Hipotética (km/s)</label>
+                                <label for="initial_velocity" class="form-label">Velocidade Inicial Hipotética
+                                    (km/s)</label>
                                 <input type="number" class="form-control" id="initial_velocity" name="initial_velocity"
                                        step="0.001" min="0" required value="5">
-                                <div class="form-text">Velocidade inicial hipotética para o cálculo do vento estelar.</div>
+                                <div class="form-text">Velocidade inicial hipotética para o cálculo do vento estelar.
+                                </div>
                             </div>
                         </div>
 
@@ -122,15 +127,21 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label for="api_efficiency_factor" class="form-label">Fator de Eficiência</label>
-                                <input type="number" class="form-control" id="api_efficiency_factor" name="efficiency_factor"
+                                <input type="number" class="form-control" id="api_efficiency_factor"
+                                       name="efficiency_factor"
                                        step="0.01" min="0" max="1" required value="0.3">
-                                <div class="form-text">Valor entre 0 e 1 que representa a eficiência da fotoevaporação.</div>
+                                <div class="form-text">Valor entre 0 e 1 que representa a eficiência da
+                                    fotoevaporação.
+                                </div>
                             </div>
                             <div class="col-md-4">
-                                <label for="api_initial_velocity" class="form-label">Velocidade Inicial Hipotética (km/s)</label>
-                                <input type="number" class="form-control" id="api_initial_velocity" name="initial_velocity"
+                                <label for="api_initial_velocity" class="form-label">Velocidade Inicial Hipotética
+                                    (km/s)</label>
+                                <input type="number" class="form-control" id="api_initial_velocity"
+                                       name="initial_velocity"
                                        step="0.001" min="0" required value="5">
-                                <div class="form-text">Velocidade inicial hipotética para o cálculo do vento estelar.</div>
+                                <div class="form-text">Velocidade inicial hipotética para o cálculo do vento estelar.
+                                </div>
                             </div>
                         </div>
 
@@ -155,16 +166,32 @@
                         <h5>Propriedades da Estrela</h5>
                         <table class="table table-sm">
                             <tr>
-                                <td>Idade Estelar (Gyr):</td>
+                                <td>Idade Estelar:</td>
                                 <td id="result_idade_estrela"></td>
                             </tr>
                             <tr>
-                                <td>Luminosidade em Raios-X:</td>
-                                <td id="result_lx"></td>
+                                <td>Raio Estelar:</td>
+                                <td id="result_r_estelar_rsol"></td>
                             </tr>
                             <tr>
-                                <td>Temperatura Coronal:</td>
-                                <td id="result_t_cor"></td>
+                                <td>Massa Estelar:</td>
+                                <td id="result_massa_estrela_msol"></td>
+                            </tr>
+                            <tr>
+                                <td>Raio do planeta:</td>
+                                <td id="result_r_planeta_rterra"></td>
+                            </tr>
+                            <tr>
+                                <td>Massa do planeta:</td>
+                                <td id="result_m_planeta_mterra"></td>
+                            </tr>
+                            <tr>
+                                <td>Semi-eixo Maior:</td>
+                                <td id="result_semi_eixo"></td>
+                            </tr>
+                            <tr>
+                                <td>Excentricidade:</td>
+                                <td id="result_planeta_excentricidade"></td>
                             </tr>
                         </table>
                     </div>
@@ -176,15 +203,27 @@
                                 <td id="result_fator_de_eficiencia"></td>
                             </tr>
                             <tr>
-                                <td>Vel. Inicial Hipotética (m/s):</td>
+                                <td>Vel. Inicial Hipotética:</td>
                                 <td id="result_velocidade_inicial"></td>
                             </tr>
                             <tr>
-                                <td>Vel. Vento Estelar (km/s):</td>
+                                <td>Lx:</td>
+                                <td id="result_lx"></td>
+                            </tr>
+                            <tr>
+                                <td>Fx:</td>
+                                <td id="result_fx"></td>
+                            </tr>
+                            <tr>
+                                <td>Temperatura Coronal:</td>
+                                <td id="result_t_cor"></td>
+                            </tr>
+                            <tr>
+                                <td>Vel. Vento Estelar:</td>
                                 <td id="result_velocidade_vento_estelar"></td>
                             </tr>
                             <tr>
-                                <td>Dens. Vento Estelar (g/s):</td>
+                                <td>Dens. Vento Estelar:</td>
                                 <td id="result_densidade_vento_estelar"></td>
                             </tr>
                         </table>

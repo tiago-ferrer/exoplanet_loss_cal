@@ -1,26 +1,26 @@
 // Store calculation results globally
 let calculationResults = null;
 
-$(document).ready(function() {
+$(document).ready(function () {
     // Handle manual form submission
-    $('#manualForm').on('submit', function(e) {
+    $('#manualForm').on('submit', function (e) {
         e.preventDefault();
         submitForm($(this));
     });
 
     // Handle API form submission
-    $('#apiForm').on('submit', function(e) {
+    $('#apiForm').on('submit', function (e) {
         e.preventDefault();
         submitForm($(this));
     });
 
     // Handle export velocity chart button click
-    $('#exportVelocityBtn').on('click', function() {
+    $('#exportVelocityBtn').on('click', function () {
         exportChart('velocity');
     });
 
     // Handle export density chart button click
-    $('#exportDensityBtn').on('click', function() {
+    $('#exportDensityBtn').on('click', function () {
         exportChart('density');
     });
 
@@ -41,7 +41,7 @@ $(document).ready(function() {
             type: 'POST',
             data: form.serialize(),
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     // Display results
                     displayResults(response.results);
@@ -51,12 +51,12 @@ $(document).ready(function() {
                     $('#errorAlert').show();
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 // Display error
                 $('#errorMessage').text('Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente.');
                 $('#errorAlert').show();
             },
-            complete: function() {
+            complete: function () {
                 // Reset button
                 submitBtn.prop('disabled', false).text(originalBtnText);
             }
@@ -71,6 +71,13 @@ $(document).ready(function() {
         // Populate result fields
         $('#result_lx').text(results.lx);
         $('#result_t_cor').text(results.t_cor);
+        $('#result_fx').text(results.fx);
+        $('#result_r_estelar_rsol').text(results.r_estelar_rsol);
+        $('#result_massa_estrela_msol').text(results.massa_estrela_msol);
+        $('#result_r_planeta_rterra').text(results.r_planeta_rterra);
+        $('#result_m_planeta_mterra').text(results.m_planeta_mterra);
+        $('#result_semi_eixo').text(results.semi_eixo);
+        $('#result_planeta_excentricidade').text(results.planeta_excentricidade);
         $('#result_mass_loss_photoev').text(results.mass_loss_photoev);
         $('#result_mass_loss_photoev_percent').text(results.mass_loss_photoev_percent);
         $('#result_mass_loss_wind').text(results.mass_loss_wind);
@@ -203,18 +210,18 @@ $(document).ready(function() {
                     pointRadius: 0,
                     fill: false
                 },
-                {
-                    // Add a point at the planet's distance
-                    label: `Densidade na distância do planeta (${planetDistanceRsol.toExponential(2)} cm-3)`,
-                    data: [{x: planetDistanceRsol, y: planetDensity}],
-                    borderColor: 'rgba(255, 0, 0, 1)',
-                    backgroundColor: 'rgba(255, 0, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 5,
-                    pointStyle: 'circle',
-                    fill: false,
-                    showLine: false
-                }]
+                    {
+                        // Add a point at the planet's distance
+                        label: `Densidade na distância do planeta (${planetDistanceRsol.toExponential(2)} cm-3)`,
+                        data: [{x: planetDistanceRsol, y: planetDensity}],
+                        borderColor: 'rgba(255, 0, 0, 1)',
+                        backgroundColor: 'rgba(255, 0, 0, 1)',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        pointStyle: 'circle',
+                        fill: false,
+                        showLine: false
+                    }]
             },
             options: {
                 responsive: true,
@@ -227,7 +234,7 @@ $(document).ready(function() {
                             text: 'Distância (Rsol)'
                         },
                         ticks: {
-                            callback: function(value, index, values) {
+                            callback: function (value, index, values) {
                                 return formatPowerOfTen(value);
                             },
                             major: {
@@ -238,7 +245,7 @@ $(document).ready(function() {
                                 display: false
                             },
                             // Only show major ticks of log function (powers of 10)
-                            filter: function(value, index, values) {
+                            filter: function (value, index, values) {
                                 // Check if the value is a power of 10 (10^n where n is an integer)
                                 return Math.log10(value) % 1 === 0;
                             }
@@ -251,7 +258,7 @@ $(document).ready(function() {
                             text: 'Densidade (cm⁻³)'
                         },
                         ticks: {
-                            callback: function(value, index, values) {
+                            callback: function (value, index, values) {
                                 return formatPowerOfTen(value);
                             },
                             major: {
@@ -261,7 +268,7 @@ $(document).ready(function() {
                                 enabled: false,
                                 display: false
                             },
-                            filter: function(value, index, values) {
+                            filter: function (value, index, values) {
                                 return Math.log10(value) % 1 === 0;
                             }
                         }
@@ -310,10 +317,10 @@ $(document).ready(function() {
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            title: function(context) {
+                            title: function (context) {
                                 return `Distância: ${context[0].parsed.x.toExponential(2)} Rsol`;
                             },
-                            label: function(context) {
+                            label: function (context) {
                                 return `Densidade: ${context.parsed.y.toExponential(2)} cm⁻³`;
                             }
                         }
@@ -350,18 +357,18 @@ $(document).ready(function() {
                     pointRadius: 0,
                     fill: false
                 },
-                {
-                    // Add a point at the planet's distance
-                    label: `Velocidade na distância do planeta (${data.velocity.toExponential(2)} km/s)`,
-                    data: [{x: data.distance, y: data.velocity}],
-                    borderColor: 'rgba(255, 0, 0, 1)',
-                    backgroundColor: 'rgba(255, 0, 0, 1)',
-                    borderWidth: 2,
-                    pointRadius: 5,
-                    pointStyle: 'circle',
-                    fill: false,
-                    showLine: false
-                }]
+                    {
+                        // Add a point at the planet's distance
+                        label: `Velocidade na distância do planeta (${data.velocity.toExponential(2)} km/s)`,
+                        data: [{x: data.distance, y: data.velocity}],
+                        borderColor: 'rgba(255, 0, 0, 1)',
+                        backgroundColor: 'rgba(255, 0, 0, 1)',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        pointStyle: 'circle',
+                        fill: false,
+                        showLine: false
+                    }]
             },
             options: {
                 responsive: true,
@@ -375,7 +382,7 @@ $(document).ready(function() {
                         },
                         ticks: {
                             beginAtZero: true,
-                            callback: function(value, index, values) {
+                            callback: function (value, index, values) {
                                 return value.toFixed(2);
                             },
                             major: {
@@ -401,10 +408,10 @@ $(document).ready(function() {
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            title: function(context) {
+                            title: function (context) {
                                 return `Distância: ${context[0].parsed.x.toExponential(2)} au`;
                             },
-                            label: function(context) {
+                            label: function (context) {
                                 return `Velocidade: ${context.parsed.y.toExponential(2)} km/s`;
                             }
                         }
@@ -482,34 +489,34 @@ $(document).ready(function() {
                 calculation_results: calculationResults // Include calculation results
             })
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao exportar o gráfico');
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            // Create a download link and trigger it
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `${chartType}_chart.png`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao exportar o gráfico');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                // Create a download link and trigger it
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `${chartType}_chart.png`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
 
-            // Reset button
-            $btn.html(originalBtnText);
-            $btn.prop('disabled', false);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Erro ao exportar o gráfico: ' + error.message);
+                // Reset button
+                $btn.html(originalBtnText);
+                $btn.prop('disabled', false);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao exportar o gráfico: ' + error.message);
 
-            // Reset button
-            $btn.html(originalBtnText);
-            $btn.prop('disabled', false);
-        });
+                // Reset button
+                $btn.html(originalBtnText);
+                $btn.prop('disabled', false);
+            });
     }
 });
