@@ -78,8 +78,10 @@ $(document).ready(function () {
         $('#result_m_planeta_mterra').text(results.m_planeta_mterra);
         $('#result_semi_eixo').text(results.semi_eixo);
         $('#result_planeta_excentricidade').text(results.planeta_excentricidade);
+        $('#result_txmass_loss_photoev').text(results.tx_mass_loss_photoev);
         $('#result_mass_loss_photoev').text(results.mass_loss_photoev);
         $('#result_mass_loss_photoev_percent').text(results.mass_loss_photoev_percent);
+        $('#result_txmass_loss_wind').text(results.tx_mass_loss_wind);
         $('#result_mass_loss_wind').text(results.mass_loss_wind);
         $('#result_mass_loss_wind_percent').text(results.mass_loss_wind_percent);
         $('#result_total_mass_loss').text(results.total_mass_loss);

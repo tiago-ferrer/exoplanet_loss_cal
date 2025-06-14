@@ -123,12 +123,14 @@ def calculate():
             "lx": f"{results['lx']:.2e} erg s−1",
             "t_cor": f"{results['t_cor'] / 1e6:.2f} MK",
             "fx": f"{results['fx']:.2e} erg s−1 cm−3",
-            "mass_loss_photoev": f"{results['mass_loss_photoev']:.2e}",
-            "mass_loss_photoev_percent": f"{results['mass_loss_photoev_percent']:.2e}",
-            "mass_loss_wind": f"{results['mass_loss_wind']:.2e}",
-            "mass_loss_wind_percent": f"{results['mass_loss_wind_percent']:.2e}",
-            "total_mass_loss": f"{results['total_mass_loss']:.2e}",
-            "total_mass_loss_percent": f"{results['total_mass_loss_percent']:.2e}",
+            "tx_mass_loss_photoev": f"{results['txmass_loss_photoev']:.2e} g/s",
+            "mass_loss_photoev": f"{results['mass_loss_photoev']:.2e} g",
+            "mass_loss_photoev_percent": f"{results['mass_loss_photoev_percent']:.2e} %",
+            "tx_mass_loss_wind": f"{results['txmass_loss_wind']:.2e} g/s",
+            "mass_loss_wind": f"{results['mass_loss_wind']:.2e} g",
+            "mass_loss_wind_percent": f"{results['mass_loss_wind_percent']:.2e} %",
+            "total_mass_loss": f"{results['total_mass_loss']:.2e} g",
+            "total_mass_loss_percent": f"{results['total_mass_loss_percent']:.2e} %",
             "planet_distance": planet_data["EixoMaiorPlaneta"],  # Pass the planet's distance for reference lines
             "density_vs_distance": results['density_vs_distance'],  # Pass the density vs distance data for plotting
             "velocity_vs_distance": results['velocity_vs_distance'],  # Pass the velocity vs distance data for plotting
