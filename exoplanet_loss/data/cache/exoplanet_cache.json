@@ -52,5 +52,14 @@
     "EixoMaiorPlaneta": 0.03585,
     "Excentricidade": 0.019,
     "t_gyr": 11.0
+  },
+  "toi-700_d": {
+    "Restrela": 0.08154,
+    "Mestrela": 0.00406,
+    "RplanetaEarth": 1.0721759999999998,
+    "MplanetaEarth": 2.259558,
+    "EixoMaiorPlaneta": 0.1633,
+    "Excentricidade": 0.042,
+    "t_gyr": 1.5
   }
 }

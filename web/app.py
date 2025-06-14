@@ -102,11 +102,12 @@ def calculate():
                 "Excentricidade": float(request.form.get('eccentricity'))
             }
 
-        # Get efficiency factor from form data
+        # Get efficiency factor and initial velocity from form data
         efficiency_factor = float(request.form.get('efficiency_factor', 0.3))
+        initial_velocity = float(request.form.get('initial_velocity', 5000))
 
         # Calculate mass loss
-        results = calculate_mass_loss(star_data, planet_data, efficiency_factor)
+        results = calculate_mass_loss(star_data, planet_data, efficiency_factor, initial_velocity * 1000)
 
         # Format results for display
         formatted_results = {
@@ -124,7 +125,8 @@ def calculate():
             "velicidade_vento_estelar": f"{results['velicidade_vento_estelar']:.2e}",
             "densidade_vento_estelar": f"{results['densidade_vento_estelar']:.2e}",
             "idade_estrela": results["idade_estrela"],
-            "fator_de_eficiencia":results["fator_de_eficiencia"]
+            "fator_de_eficiencia": results["fator_de_eficiencia"],
+            "velocidade_inicial": results["velocidade_inicial"]
         }
 
         return jsonify({"success": True, "results": formatted_results})

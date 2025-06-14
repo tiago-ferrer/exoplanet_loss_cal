@@ -78,12 +78,19 @@
                             </div>
                         </div>
 
+                        <h4>Propriedades para Simulação</h4>
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label for="efficiency_factor" class="form-label">Fator de Eficiência</label>
                                 <input type="number" class="form-control" id="efficiency_factor" name="efficiency_factor"
                                        step="0.01" min="0" max="1" required value="0.3">
                                 <div class="form-text">Valor entre 0 e 1 que representa a eficiência da fotoevaporação.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="initial_velocity" class="form-label">Velocidade Inicial Hipotética (km/s)</label>
+                                <input type="number" class="form-control" id="initial_velocity" name="initial_velocity"
+                                       step="0.001" min="0" required value="5">
+                                <div class="form-text">Velocidade inicial hipotética para o cálculo do vento estelar.</div>
                             </div>
                         </div>
 
@@ -97,7 +104,7 @@
                 <div class="tab-pane fade" id="api" role="tabpanel" aria-labelledby="api-tab">
                     <form id="apiForm">
                         <input type="hidden" name="use_api" value="true">
-
+                        <h4>Dados para Busca</h4>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="star_name" class="form-label">Nome da Estrela</label>
@@ -111,12 +118,19 @@
                             </div>
                         </div>
 
+                        <h4>Propriedades para Simulação</h4>
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label for="api_efficiency_factor" class="form-label">Fator de Eficiência</label>
                                 <input type="number" class="form-control" id="api_efficiency_factor" name="efficiency_factor"
                                        step="0.01" min="0" max="1" required value="0.3">
                                 <div class="form-text">Valor entre 0 e 1 que representa a eficiência da fotoevaporação.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="api_initial_velocity" class="form-label">Velocidade Inicial Hipotética (km/s)</label>
+                                <input type="number" class="form-control" id="api_initial_velocity" name="initial_velocity"
+                                       step="0.001" min="0" required value="5">
+                                <div class="form-text">Velocidade inicial hipotética para o cálculo do vento estelar.</div>
                             </div>
                         </div>
 
@@ -160,6 +174,10 @@
                             <tr>
                                 <td>Fator de eficiência:</td>
                                 <td id="result_fator_de_eficiencia"></td>
+                            </tr>
+                            <tr>
+                                <td>Vel. Inicial Hipotética (m/s):</td>
+                                <td id="result_velocidade_inicial"></td>
                             </tr>
                             <tr>
                                 <td>Vel. Vento Estelar (km/s):</td>

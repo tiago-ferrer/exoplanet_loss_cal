@@ -80,6 +80,7 @@ $(document).ready(function() {
         $('#result_velocidade_vento_estelar').text(results.velicidade_vento_estelar);
         $('#result_densidade_vento_estelar').text(results.densidade_vento_estelar);
         $('#result_fator_de_eficiencia').text(results.fator_de_eficiencia);
+        $('#result_velocidade_inicial').text(results.velocidade_inicial);
         $('#result_idade_estrela').text(results.idade_estrela);
 
         // Create the density vs distance chart

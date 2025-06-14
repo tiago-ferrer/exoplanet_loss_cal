@@ -15,7 +15,7 @@ Rearth = 6.371e8  # cm
 Mearth = 5.97e27  # grams
 AU = 1.496e11 * 100  # 1 AU in cm
 
-def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3):
+def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3, initial_velocity=5e3):
     """
     Calculate mass loss for a planet due to photoevaporation and stellar wind.
 
@@ -30,6 +30,7 @@ def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3):
             - EixoMaiorPlaneta: Semi-major axis in AU
             - Excentricidade: Orbital eccentricity
         efficiency_factor (float, optional): Efficiency factor for photoevaporation calculation. Defaults to 0.3.
+        initial_velocity (float, optional): Initial guess velocity [m/s] for stellar wind calculation. Defaults to 5e3 m/s.
 
     Returns:
         dict: Dictionary containing mass loss results
@@ -69,7 +70,9 @@ def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3):
     # Generate velocity vs distance data for plotting
     r_min_au = 0.005  # Minimum radius in AU
     vel_distances, velocities,veloc = generate_velocity_vs_distance_data(T_corona=t_cor, r_planeta_au=EixoMaiorPlaneta,
-                                                                 r_min_au=r_min_au, r_max_au=(EixoMaiorPlaneta*4),Mstar=Mestrela*Msun,num_points=1000)
+                                                                 r_min_au=r_min_au, r_max_au=(EixoMaiorPlaneta*4),
+                                                                 Mstar=Mestrela*Msun, v_initial_at_start=initial_velocity,
+                                                                 num_points=1000)
 
     mLossWind = calcular_taxa_perda_de_massa_interacao_vento_solar(RplanetaEarth * Rearth, d_w, veloc *1000)
     mLossWindPercent = (mLossWind * 100) / (MplanetaEarth * Mearth)
@@ -88,6 +91,7 @@ def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3):
     return {
         "idade_estrela": t_gyr,
         "fator_de_eficiencia": n,
+        "velocidade_inicial": initial_velocity,
         "lx": lx,
         "t_cor": t_cor,
         "velicidade_vento_estelar": veloc,

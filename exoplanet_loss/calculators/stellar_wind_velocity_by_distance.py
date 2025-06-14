@@ -14,7 +14,7 @@ mp = 1.6726219e-27  # proton mass [kg]
 G = 6.67430e-11  # gravitational constant [m^3 kg^-1 s^-2]
 AU_km = 1.496e8  # 1 AU in meters
 
-def generate_velocity_vs_distance_data(T_corona, r_planeta_au, r_min_au, r_max_au,Mstar, num_points=500):
+def generate_velocity_vs_distance_data(T_corona, r_planeta_au, r_min_au, r_max_au, Mstar, v_initial_at_start=5e3, num_points=500):
     """
     Generate data points for plotting stellar wind velocity vs distance.
 
@@ -23,8 +23,9 @@ def generate_velocity_vs_distance_data(T_corona, r_planeta_au, r_min_au, r_max_a
         r_min (float): Minimum radius in AU
         r_max (float): Maximum radius in AU
         r_planeta(float): raio do planeta in AU
-        num_points (int): Number of data points to generate
         Mstar(float): number in kg
+        v_initial_at_start (float, optional): Initial guess velocity [m/s] at the first radial distance. Defaults to 5e3 m/s.
+        num_points (int): Number of data points to generate
 
     Returns:
         tuple: (distances, velocities) where:
@@ -34,9 +35,6 @@ def generate_velocity_vs_distance_data(T_corona, r_planeta_au, r_min_au, r_max_a
     """
     # Create array of distances in cm
     r_au = np.linspace(r_min_au, r_max_au, num_points)
-
-    # Initial velocity guess
-    v_initial_at_start = 5e3  # e.g., 5 km/s in m/s
 
     # Calculate velocities at all radial distances
     v_sw_values = solve_solar_wind_velocity_tracking(r_au, T_corona, Mstar, v_initial_at_start)
