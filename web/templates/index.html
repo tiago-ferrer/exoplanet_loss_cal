@@ -78,6 +78,15 @@
                             </div>
                         </div>
 
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="efficiency_factor" class="form-label">Fator de Eficiência</label>
+                                <input type="number" class="form-control" id="efficiency_factor" name="efficiency_factor"
+                                       step="0.01" min="0" max="1" required value="0.3">
+                                <div class="form-text">Valor entre 0 e 1 que representa a eficiência da fotoevaporação.</div>
+                            </div>
+                        </div>
+
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">Calcular Perda de Massa</button>
                         </div>
@@ -99,6 +108,15 @@
                                 <label for="planet_name" class="form-label">Nome/Designação do Planeta</label>
                                 <input type="text" class="form-control" id="planet_name" name="planet_name" required
                                        placeholder="ex., b">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="api_efficiency_factor" class="form-label">Fator de Eficiência</label>
+                                <input type="number" class="form-control" id="api_efficiency_factor" name="efficiency_factor"
+                                       step="0.01" min="0" max="1" required value="0.3">
+                                <div class="form-text">Valor entre 0 e 1 que representa a eficiência da fotoevaporação.</div>
                             </div>
                         </div>
 

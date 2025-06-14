@@ -15,7 +15,7 @@ Rearth = 6.371e8  # cm
 Mearth = 5.97e27  # grams
 AU = 1.496e11 * 100  # 1 AU in cm
 
-def calculate_mass_loss(star_data, planet_data):
+def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3):
     """
     Calculate mass loss for a planet due to photoevaporation and stellar wind.
 
@@ -29,6 +29,7 @@ def calculate_mass_loss(star_data, planet_data):
             - MplanetaEarth: Planet mass in Earth masses
             - EixoMaiorPlaneta: Semi-major axis in AU
             - Excentricidade: Orbital eccentricity
+        efficiency_factor (float, optional): Efficiency factor for photoevaporation calculation. Defaults to 0.3.
 
     Returns:
         dict: Dictionary containing mass loss results
@@ -56,7 +57,7 @@ def calculate_mass_loss(star_data, planet_data):
     lx, t_cor = lx_age.getLx(), lx_age.getTCor()
 
     # Calculate mass loss due to photoevaporation
-    n=0.3
+    n = efficiency_factor
     photoEvp = PhotoevaporationCalculator(n, lx, RplanetaEarth * Rearth, MplanetaEarth * Mearth,
                                          EixoMaiorPlaneta * AU, Excentricidade)
     mLossPhoto = photoEvp.get()

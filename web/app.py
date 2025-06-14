@@ -102,8 +102,11 @@ def calculate():
                 "Excentricidade": float(request.form.get('eccentricity'))
             }
 
+        # Get efficiency factor from form data
+        efficiency_factor = float(request.form.get('efficiency_factor', 0.3))
+
         # Calculate mass loss
-        results = calculate_mass_loss(star_data, planet_data)
+        results = calculate_mass_loss(star_data, planet_data, efficiency_factor)
 
         # Format results for display
         formatted_results = {
