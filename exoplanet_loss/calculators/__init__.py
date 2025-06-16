@@ -2,6 +2,7 @@ from exoplanet_loss.calculators.photoevap_calculator import PhotoevaporationCalc
 from exoplanet_loss.calculators.lx_age_calculator import LxAgeFxCalculator
 from exoplanet_loss.calculators.stellar_wind_mass_loss_calculator import StellarWindMassLossCalculator, calculate_stellar_wind_mass_loss
 from exoplanet_loss.calculators.photoevaporation_mass_loss_calculator import PhotoevaporationMassLossCalculator, calculate_photoevaporation_mass_loss
+from exoplanet_loss.calculators.total_mass_loss_calculator import TotalMassLossCalculator, calculate_total_mass_loss
 
 __all__ = [
     'PhotoevaporationCalculator',
@@ -9,5 +10,7 @@ __all__ = [
     'StellarWindMassLossCalculator',
     'calculate_stellar_wind_mass_loss',
     'PhotoevaporationMassLossCalculator',
-    'calculate_photoevaporation_mass_loss'
+    'calculate_photoevaporation_mass_loss',
+    'TotalMassLossCalculator',
+    'calculate_total_mass_loss'
 ]

@@ -4,7 +4,9 @@ from exoplanet_loss.calculators import (
     StellarWindMassLossCalculator,
     calculate_stellar_wind_mass_loss,
     PhotoevaporationMassLossCalculator,
-    calculate_photoevaporation_mass_loss
+    calculate_photoevaporation_mass_loss,
+    TotalMassLossCalculator,
+    calculate_total_mass_loss
 )
 
 __all__ = [
@@ -13,5 +15,7 @@ __all__ = [
     'StellarWindMassLossCalculator',
     'calculate_stellar_wind_mass_loss',
     'PhotoevaporationMassLossCalculator',
-    'calculate_photoevaporation_mass_loss'
+    'calculate_photoevaporation_mass_loss',
+    'TotalMassLossCalculator',
+    'calculate_total_mass_loss'
 ]

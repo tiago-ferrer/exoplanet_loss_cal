@@ -6,6 +6,7 @@ import matplotlib
 
 matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Add the project root directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -13,6 +14,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from flask import Flask, render_template, request, jsonify, Response
 from exoplanet_loss.data.exoplanet import get_exoplanet_data
 from exoplanet_loss.calculador_final import calculate_mass_loss
+from exoplanet_loss.calculators.total_mass_loss_calculator import calculate_total_mass_loss
 
 # Dictionary of common error messages and their Portuguese translations
 ERROR_TRANSLATIONS = {
@@ -157,6 +159,116 @@ def get_exoplanet(star_name, planet_name):
         return jsonify({"success": False, "error": translate_error(str(e))})
 
 
+@app.route('/calculate_total_mass_loss', methods=['POST'])
+def calculate_total_mass_loss_route():
+    """Calculate total mass loss with custom age steps based on form data."""
+    try:
+        # Get form data
+        if request.form.get('use_api') == 'true':
+            # Use API to get data
+            star_name = request.form.get('star_name')
+            planet_name = request.form.get('planet_name')
+
+            # Get data from API
+            data = get_exoplanet_data(star_name, planet_name)
+
+            # Extract star and planet data
+            star_data = {
+                "Restrela": data["Restrela"],
+                "Mestrela": data["Mestrela"],
+                "t_gyr": data["t_gyr"]
+            }
+
+            planet_data = {
+                "RplanetaEarth": data["RplanetaEarth"],
+                "MplanetaEarth": data["MplanetaEarth"],
+                "EixoMaiorPlaneta": data["EixoMaiorPlaneta"],
+                "Excentricidade": data["Excentricidade"]
+            }
+        else:
+            # Use manual input
+            star_data = {
+                "Restrela": float(request.form.get('stellar_radius')),
+                "Mestrela": float(request.form.get('stellar_mass')),
+                "t_gyr": float(request.form.get('stellar_age'))
+            }
+
+            planet_data = {
+                "RplanetaEarth": float(request.form.get('planet_radius')),
+                "MplanetaEarth": float(request.form.get('planet_mass')),
+                "EixoMaiorPlaneta": float(request.form.get('semi_major_axis')),
+                "Excentricidade": float(request.form.get('eccentricity'))
+            }
+
+        # Get efficiency factor and age parameters from form data
+        efficiency_factor = float(request.form.get('efficiency_factor', 0.3))
+        min_age = float(request.form.get('min_age', 0.01))
+        max_age = float(request.form.get('max_age', star_data["t_gyr"]))
+        age_step = float(request.form.get('age_step', 0.1))
+
+        # Constants
+        Rsun = 6.957e10  # cm
+        Msun = 1.98e30  # kg
+        Rearth = 6.371e8  # cm
+        Mearth = 5.97e27  # grams
+        AU = 1.496e13  # 1 AU in cm
+
+        # Extract data
+        Restrela = star_data["Restrela"]  # Solar radii
+        Mestrela = star_data["Mestrela"]  # Solar masses
+        t_gyr = star_data["t_gyr"]  # Gyr
+
+        RplanetaEarth = planet_data["RplanetaEarth"]  # Earth radii
+        MplanetaEarth = planet_data["MplanetaEarth"]  # Earth masses
+        EixoMaiorPlaneta = planet_data["EixoMaiorPlaneta"]  # AU
+        Excentricidade = planet_data["Excentricidade"]  # Eccentricity
+
+        # Calculate total mass loss with custom age steps
+        total_mass_loss, wind_mass_loss, photoevap_mass_loss, results_data = calculate_total_mass_loss(
+            planet_radius_cm=RplanetaEarth * Rearth,
+            planet_mass_g=MplanetaEarth * Mearth,
+            planet_orbital_distance_au=EixoMaiorPlaneta,
+            eccentricity=Excentricidade,
+            stellar_radius_cm=Restrela * Rsun,
+            stellar_mass_kg=Mestrela * Msun,
+            efficiency_factor=efficiency_factor,
+            min_age=min_age,
+            max_age=max_age,
+            age_step=age_step
+        )
+
+        # Calculate percentages
+        wind_mass_loss_percent = (wind_mass_loss / (MplanetaEarth * Mearth)) * 100
+        photoevap_mass_loss_percent = (photoevap_mass_loss / (MplanetaEarth * Mearth)) * 100
+        total_mass_loss_percent = (total_mass_loss / (MplanetaEarth * Mearth)) * 100
+
+        # Format results for display
+        formatted_results = {
+            "r_estelar_rsol": f"{star_data['Restrela']} Rsol",
+            "massa_estrela_msol": f"{star_data['Mestrela']} Msol",
+            "r_planeta_rterra": f"{planet_data['RplanetaEarth']:.2f} Rterra",
+            "m_planeta_mterra": f"{planet_data['MplanetaEarth']:.2f} Mterra",
+            "semi_eixo": f"{planet_data['EixoMaiorPlaneta']} ua",
+            "planeta_excentricidade": planet_data["Excentricidade"],
+            "idade_estrela": f"{star_data['t_gyr']} Gyr",
+            "fator_de_eficiencia": efficiency_factor,
+            "min_age": min_age,
+            "max_age": max_age,
+            "age_step": age_step,
+            "mass_loss_photoev": f"{photoevap_mass_loss:.2e} g",
+            "mass_loss_photoev_percent": f"{photoevap_mass_loss_percent:.2e} %",
+            "mass_loss_wind": f"{wind_mass_loss:.2e} g",
+            "mass_loss_wind_percent": f"{wind_mass_loss_percent:.2e} %",
+            "total_mass_loss": f"{total_mass_loss:.2e} g",
+            "total_mass_loss_percent": f"{total_mass_loss_percent:.2e} %",
+            "results_data": results_data
+        }
+
+        return jsonify({"success": True, "results": formatted_results})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": translate_error(str(e))})
+
 @app.route('/export_chart', methods=['POST'])
 def export_chart():
     """Export chart data as PNG using matplotlib."""
@@ -205,6 +317,30 @@ def export_chart():
                              xytext=(10, 10), textcoords='offset points',
                              color='red', fontsize=9,
                              bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="red", alpha=0.8))
+
+        elif chart_type == 'mass_loss_rates':
+            # Logarithmic scale for mass loss rates chart
+            plt.figure(figsize=(10, 6))
+
+            # Get the results data if available
+            results_data = data.get('calculation_results', {}).get('results_data', {})
+
+            if results_data:
+                ages = results_data.get('ages', x_data)
+                wind_rates = results_data.get('wind_mass_loss_rates', [])
+                photoevap_rates = results_data.get('photoevap_mass_loss_rates', [])
+                total_rates = results_data.get('total_mass_loss_rates', y_data)
+
+                # Plot all three datasets
+                plt.semilogy(ages, wind_rates, 'o-', color='blue', label='Vento Estelar')
+                plt.semilogy(ages, photoevap_rates, 'o-', color='red', label='Fotoevaporação')
+                plt.semilogy(ages, total_rates, 'o-', color='purple', label='Total')
+            else:
+                # Fallback to just plotting the total rates
+                plt.semilogy(x_data, y_data, 'o-', color='purple', label='Total')
+
+            plt.grid(True, which="both", ls="-")
+            plt.legend()
 
         # Add labels and title
         plt.xlabel(x_label)

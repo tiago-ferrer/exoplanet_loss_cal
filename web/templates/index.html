@@ -26,6 +26,11 @@
                             role="tab" aria-controls="api" aria-selected="false">Taxa (Busca por API)
                     </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="total-mass-loss-tab" data-bs-toggle="tab" data-bs-target="#total-mass-loss" type="button"
+                            role="tab" aria-controls="total-mass-loss" aria-selected="false">Perda de Massa Total
+                    </button>
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -147,6 +152,127 @@
 
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">Buscar e Calcular</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Total Mass Loss Form -->
+                <div class="tab-pane fade" id="total-mass-loss" role="tabpanel" aria-labelledby="total-mass-loss-tab">
+                    <form id="totalMassLossForm">
+                        <input type="hidden" name="use_api" value="false">
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="useApiForTotalMassLoss">
+                                    <label class="form-check-label" for="useApiForTotalMassLoss">Usar dados da API</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="apiInputsTotalMassLoss" style="display: none;">
+                            <h4>Dados para Busca</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="total_star_name" class="form-label">Nome da Estrela</label>
+                                    <input type="text" class="form-control" id="total_star_name" name="star_name"
+                                           placeholder="ex., Kepler-7">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="total_planet_name" class="form-label">Nome/Designação do Planeta</label>
+                                    <input type="text" class="form-control" id="total_planet_name" name="planet_name"
+                                           placeholder="ex., b">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <button type="button" id="fetchExoplanetDataBtn" class="btn btn-secondary">Buscar Dados</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="manualInputsTotalMassLoss">
+                            <h4>Propriedades da Estrela</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="total_stellar_radius" class="form-label">Raio Estelar (Rsol)</label>
+                                    <input type="number" class="form-control" id="total_stellar_radius" name="stellar_radius"
+                                           step="0.01" required value="1.78">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="total_stellar_mass" class="form-label">Massa Estelar (Msol)</label>
+                                    <input type="number" class="form-control" id="total_stellar_mass" name="stellar_mass"
+                                           step="0.01" required value="1.41">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="total_stellar_age" class="form-label">Idade Estelar (Gyr)</label>
+                                    <input type="number" class="form-control" id="total_stellar_age" name="stellar_age" step="0.1"
+                                           required value="3.5">
+                                </div>
+                            </div>
+
+                            <h4>Propriedades do Planeta</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="total_planet_radius" class="form-label">Raio do Planeta (Rterra)</label>
+                                    <input type="number" class="form-control" id="total_planet_radius" name="planet_radius"
+                                           step="0.01" required value="18.18">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="total_planet_mass" class="form-label">Massa do Planeta (Mterra)</label>
+                                    <input type="number" class="form-control" id="total_planet_mass" name="planet_mass"
+                                           step="0.01" required value="140">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="total_semi_major_axis" class="form-label">Semi-eixo Maior (UA)</label>
+                                    <input type="number" class="form-control" id="total_semi_major_axis" name="semi_major_axis"
+                                           step="0.00001" required value="0.06067">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="total_eccentricity" class="form-label">Excentricidade</label>
+                                    <input type="number" class="form-control" id="total_eccentricity" name="eccentricity"
+                                           step="0.001" min="0" max="1" required value="0.026">
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4>Propriedades para Simulação</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="total_efficiency_factor" class="form-label">Fator de Eficiência</label>
+                                <input type="number" class="form-control" id="total_efficiency_factor"
+                                       name="efficiency_factor"
+                                       step="0.01" min="0" max="1" required value="0.3">
+                                <div class="form-text">Valor entre 0 e 1 que representa a eficiência da
+                                    fotoevaporação.
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4>Parâmetros de Idade para Iteração</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="min_age" class="form-label">Idade Mínima (Gyr)</label>
+                                <input type="number" class="form-control" id="min_age" name="min_age"
+                                       step="0.01" min="0.01" required value="0.01">
+                                <div class="form-text">Idade mínima para iniciar a iteração (em Gyr).</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="max_age" class="form-label">Idade Máxima (Gyr)</label>
+                                <input type="number" class="form-control" id="max_age" name="max_age"
+                                       step="0.1" min="0.1" required value="3.5">
+                                <div class="form-text">Idade máxima para a iteração (em Gyr). Por padrão, usa a idade da estrela.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="age_step" class="form-label">Passo de Idade (Gyr)</label>
+                                <input type="number" class="form-control" id="age_step" name="age_step"
+                                       step="0.01" min="0.01" required value="0.1">
+                                <div class="form-text">Intervalo entre cada idade na iteração (em Gyr).</div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Calcular Perda de Massa Total</button>
                         </div>
                     </form>
                 </div>
@@ -277,6 +403,134 @@
             </div>
 
 
+        </div>
+    </div>
+
+    <!-- Total Mass Loss Results Card (initially hidden) -->
+    <div class="card mt-4 mb-5" id="totalMassLossResultsCard" style="display: none;">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Resultados da Perda de Massa Total</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <h5>Propriedades da Estrela e Planeta</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td>Idade Estelar:</td>
+                                <td id="total_result_idade_estrela"></td>
+                            </tr>
+                            <tr>
+                                <td>Raio Estelar:</td>
+                                <td id="total_result_r_estelar_rsol"></td>
+                            </tr>
+                            <tr>
+                                <td>Massa Estelar:</td>
+                                <td id="total_result_massa_estrela_msol"></td>
+                            </tr>
+                            <tr>
+                                <td>Raio do planeta:</td>
+                                <td id="total_result_r_planeta_rterra"></td>
+                            </tr>
+                            <tr>
+                                <td>Massa do planeta:</td>
+                                <td id="total_result_m_planeta_mterra"></td>
+                            </tr>
+                            <tr>
+                                <td>Semi-eixo Maior:</td>
+                                <td id="total_result_semi_eixo"></td>
+                            </tr>
+                            <tr>
+                                <td>Excentricidade:</td>
+                                <td id="total_result_planeta_excentricidade"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div>
+                        <h5>Parâmetros de Simulação:</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td>Fator de eficiência:</td>
+                                <td id="total_result_fator_de_eficiencia"></td>
+                            </tr>
+                            <tr>
+                                <td>Idade Mínima:</td>
+                                <td id="total_result_min_age"></td>
+                            </tr>
+                            <tr>
+                                <td>Idade Máxima:</td>
+                                <td id="total_result_max_age"></td>
+                            </tr>
+                            <tr>
+                                <td>Passo de Idade:</td>
+                                <td id="total_result_age_step"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h5>Perda de Massa</h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Perda por Fotoevaporação:</td>
+                            <td id="total_result_mass_loss_photoev"></td>
+                        </tr>
+                        <tr>
+                            <td>Perda por Vento Estelar:</td>
+                            <td id="total_result_mass_loss_wind"></td>
+                        </tr>
+                        <tr class="table-primary">
+                            <td><strong>Perda de Massa Total:</strong></td>
+                            <td id="total_result_total_mass_loss"></td>
+                        </tr>
+                        <tr>
+                            <td>Percentual da Massa do Planeta:</td>
+                            <td id="total_result_total_mass_loss_percent"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h5>Resultados Detalhados por Idade</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped" id="detailedResultsTable">
+                            <thead>
+                                <tr>
+                                    <th>Idade (Gyr)</th>
+                                    <th>Fx (erg/s/cm²)</th>
+                                    <th>Temp. Coronal (K)</th>
+                                    <th>Vel. Vento (km/s)</th>
+                                    <th>Dens. Vento (g/cm³)</th>
+                                    <th>Tx. Fotoevap. (g/s)</th>
+                                    <th>Tx. Vento Est. (g/s)</th>
+                                    <th>Tx. Total (g/s)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detailedResultsTableBody">
+                                <!-- Results will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mass Loss Rates Graph -->
+            <div class="row mt-4 mb-2">
+                <div class="col-12">
+                    <h5>Taxas de Perda de Massa vs Idade
+                        <button id="exportMassLossRatesBtn" class="btn btn-sm btn-outline-secondary float-end">
+                            <i class="bi bi-download"></i> Exportar PNG
+                        </button>
+                    </h5>
+                    <div class="chart-container" style="position: relative; height:400px;">
+                        <canvas id="massLossRatesChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
