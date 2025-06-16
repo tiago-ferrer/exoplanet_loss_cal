@@ -21,7 +21,7 @@ $(document).ready(function () {
     });
 
     // Toggle between API and manual inputs for total mass loss
-    $('#useApiForTotalMassLoss').on('change', function() {
+    $('#useApiForTotalMassLoss').on('change', function () {
         if ($(this).is(':checked')) {
             $('#apiInputsTotalMassLoss').show();
             $('#manualInputsTotalMassLoss').hide();
@@ -34,7 +34,7 @@ $(document).ready(function () {
     });
 
     // Handle fetch exoplanet data button click
-    $('#fetchExoplanetDataBtn').on('click', function() {
+    $('#fetchExoplanetDataBtn').on('click', function () {
         const starName = $('#total_star_name').val();
         const planetName = $('#total_planet_name').val();
 
@@ -53,7 +53,7 @@ $(document).ready(function () {
             url: `/api/exoplanet/${starName}/${planetName}`,
             type: 'GET',
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     // Fill form fields with data
                     const data = response.data;
@@ -76,10 +76,10 @@ $(document).ready(function () {
                     alert('Erro ao buscar dados: ' + response.error);
                 }
             },
-            error: function() {
+            error: function () {
                 alert('Erro ao conectar ao servidor. Por favor, tente novamente.');
             },
-            complete: function() {
+            complete: function () {
                 // Reset button
                 btn.prop('disabled', false).text(originalBtnText);
             }
@@ -311,7 +311,7 @@ $(document).ready(function () {
                             text: 'Taxa de Perda de Massa (g/s)'
                         },
                         ticks: {
-                            callback: function(value, index, values) {
+                            callback: function (value, index, values) {
                                 return value.toExponential(0);
                             }
                         }
@@ -320,7 +320,7 @@ $(document).ready(function () {
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 return context.dataset.label + ': ' + context.parsed.y.toExponential(2) + ' g/s';
                             }
                         }
@@ -829,35 +829,35 @@ $(document).ready(function () {
                 calculation_results: calculationResults // Include calculation results
             })
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao exportar o gráfico');
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            // Create a download link and trigger it
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'mass_loss_rates_chart.png';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao exportar o gráfico');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                // Create a download link and trigger it
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'mass_loss_rates_chart.png';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
 
-            // Reset button
-            $btn.html(originalBtnText);
-            $btn.prop('disabled', false);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Erro ao exportar o gráfico: ' + error.message);
+                // Reset button
+                $btn.html(originalBtnText);
+                $btn.prop('disabled', false);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao exportar o gráfico: ' + error.message);
 
-            // Reset button
-            $btn.html(originalBtnText);
-            $btn.prop('disabled', false);
-        });
+                // Reset button
+                $btn.html(originalBtnText);
+                $btn.prop('disabled', false);
+            });
     }
 
     // Function to convert HTML table to LaTeX format and copy to clipboard
@@ -870,63 +870,155 @@ $(document).ready(function () {
         }
 
         // Start building LaTeX table
-        let latexCode = '\\begin{table}[htbp]\n';
+        let latexCode = '\\begin{table*}[htbp]\n';
         latexCode += '\\centering\n';
         latexCode += '\\caption{Resultados Detalhados por Idade}\n';
-        latexCode += '\\begin{tabular}{';
-
-        // Add column specifications based on the number of columns
-        const headerRow = table.querySelector('thead tr');
-        if (!headerRow) {
-            alert('Cabeçalho da tabela não encontrado.');
-            return;
-        }
-
-        const numColumns = headerRow.cells.length;
-        for (let i = 0; i < numColumns; i++) {
-            latexCode += 'c';
-        }
-        latexCode += '}\n\\hline\n';
-
-        // Add header row
-        const headers = [];
-        for (let i = 0; i < headerRow.cells.length; i++) {
-            headers.push(headerRow.cells[i].textContent.trim());
-        }
-        latexCode += headers.join(' & ') + ' \\\\ \\hline\n';
-
-        // Add data rows
+        latexCode += '\\resizebox{\\linewidth}{!}{%\n';
+        latexCode += '\\begin{tabular}{c c c c c c c c}';
+        latexCode += '\\hline\\hline';
+        latexCode += '\\textbf{Idade} & \\textbf{Fluxo} & \\textbf{Temp. Coronal} & \\textbf{Vel. Vento} & \\textbf{Dens. Vento} & \\textbf{Fotoevap.} & \\textbf{Vento Est.} & \\textbf{Total} \\\\';
+        latexCode += '(Gyr) & (erg/s/cm²) & (K) & (km/s) & (g/cm³) & (g/s) & (g/s) & (g/s) \\\\'
+        latexCode += '\\hline\\hline';
+        // Get all data rows
         const tbody = table.querySelector('tbody');
         if (!tbody) {
             alert('Corpo da tabela não encontrado.');
             return;
         }
 
-        const rows = tbody.querySelectorAll('tr');
-        for (let i = 0; i < rows.length; i++) {
-            const cells = rows[i].querySelectorAll('td');
+        const allRows = Array.from(tbody.querySelectorAll('tr'));
+        if (allRows.length === 0) {
+            alert('Nenhum dado encontrado na tabela.');
+            return;
+        }
+
+        // Find the row with age closest to 0.01 (should be the first row)
+        let minAgeRow = allRows[0];
+        let minAgeValue = parseFloat(minAgeRow.querySelector('td').textContent);
+        let minAgeIndex = 0;
+
+        // Find the row with the maximum age (should be the last row)
+        let maxAgeRow = allRows[allRows.length - 1];
+        let maxAgeValue = parseFloat(maxAgeRow.querySelector('td').textContent);
+        let maxAgeIndex = allRows.length - 1;
+
+        // Verify and adjust if needed
+        for (let i = 0; i < allRows.length; i++) {
+            const age = parseFloat(allRows[i].querySelector('td').textContent);
+
+            // Find the row with age closest to 0.01
+            if (Math.abs(age - 0.01) < Math.abs(minAgeValue - 0.01)) {
+                minAgeRow = allRows[i];
+                minAgeValue = age;
+                minAgeIndex = i;
+            }
+
+            // Find the row with the maximum age
+            if (age > maxAgeValue) {
+                maxAgeRow = allRows[i];
+                maxAgeValue = age;
+                maxAgeIndex = i;
+            }
+        }
+
+        // Select rows to include in the LaTeX table (maximum 6 rows)
+        let selectedRows = [];
+
+        // Always include the row with age closest to 0.01
+        selectedRows.push(minAgeRow);
+
+        // Always include the row with the maximum age
+        if (minAgeIndex !== maxAgeIndex) {
+            selectedRows.push(maxAgeRow);
+        }
+
+        // If we need more rows to reach 6 total, add evenly distributed rows between min and max
+        if (allRows.length > 2 && selectedRows.length < 6) {
+            // Calculate how many additional rows we need
+            const additionalRowsNeeded = Math.min(6 - selectedRows.length, maxAgeIndex - minAgeIndex - 1);
+
+            if (additionalRowsNeeded > 0) {
+                // Calculate step size for evenly distributed rows
+                const step = (maxAgeIndex - minAgeIndex) / (additionalRowsNeeded + 1);
+
+                // Add evenly distributed rows
+                for (let i = 1; i <= additionalRowsNeeded; i++) {
+                    const index = Math.round(minAgeIndex + i * step);
+                    if (index > minAgeIndex && index < maxAgeIndex) {
+                        selectedRows.push(allRows[index]);
+                    }
+                }
+            }
+        }
+
+        // Sort selected rows by age
+        selectedRows.sort((a, b) => {
+            const ageA = parseFloat(a.querySelector('td').textContent);
+            const ageB = parseFloat(b.querySelector('td').textContent);
+            return ageA - ageB;
+        });
+
+        // Add selected rows to LaTeX code
+        for (const row of selectedRows) {
+            const cells = row.querySelectorAll('td');
             const rowData = [];
 
             for (let j = 0; j < cells.length; j++) {
-                rowData.push(cells[j].textContent.trim());
+                let cellValue = cells[j].textContent.trim();
+
+                // Format numbers in scientific notation for specific columns (Fx, densities, rates)
+                if (j === 1 || j === 4 || j === 5 || j === 6 || j === 7) {
+                    const num = parseFloat(cellValue);
+                    if (!isNaN(num)) {
+                        cellValue = num.toExponential(2);
+                    }
+                }
+
+                // Format temperature with 2 decimal places
+                if (j === 2) {
+                    const num = parseFloat(cellValue);
+                    if (!isNaN(num)) {
+                        // Format with 2 decimal places
+                        cellValue = num.toFixed(2);
+                    }
+                }
+
+                // Format velocity with 2 decimal places
+                if (j === 3) {
+                    const num = parseFloat(cellValue);
+                    if (!isNaN(num)) {
+                        cellValue = num.toFixed(2);
+                    }
+                }
+
+                // Format age with 2 decimal places
+                if (j === 0) {
+                    const num = parseFloat(cellValue);
+                    if (!isNaN(num)) {
+                        cellValue = num.toFixed(2);
+                    }
+                }
+
+                rowData.push(cellValue);
             }
 
-            latexCode += rowData.join(' & ') + ' \\\\ \n';
+            latexCode += rowData.join(' & ') + ' \\\\ ';
         }
 
         // Close the LaTeX table
-        latexCode += '\\hline\n\\end{tabular}\n';
+        latexCode += '\\hline\\hline\n\\end{tabular}%\n';
+        latexCode += '}\n';
         latexCode += '\\label{tab:detailed_results}\n';
-        latexCode += '\\end{table}';
+        latexCode += '\\end{table*}';
 
         // Copy to clipboard
         try {
             navigator.clipboard.writeText(latexCode).then(
-                function() {
+                function () {
                     // Show success message
-                    alert('Tabela copiada para a área de transferência em formato LaTeX.');
-                }, 
-                function() {
+                    alert('Tabela copiada para a área de transferência em formato LaTeX (máximo 6 linhas).');
+                },
+                function () {
                     // Fallback for older browsers
                     const textarea = document.createElement('textarea');
                     textarea.value = latexCode;
@@ -934,7 +1026,7 @@ $(document).ready(function () {
                     textarea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textarea);
-                    alert('Tabela copiada para a área de transferência em formato LaTeX.');
+                    alert('Tabela copiada para a área de transferência em formato LaTeX (máximo 6 linhas).');
                 }
             );
         } catch (err) {
@@ -945,7 +1037,7 @@ $(document).ready(function () {
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-            alert('Tabela copiada para a área de transferência em formato LaTeX.');
+            alert('Tabela copiada para a área de transferência em formato LaTeX (máximo 6 linhas).');
         }
     }
 });
