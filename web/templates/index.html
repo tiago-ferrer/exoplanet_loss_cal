@@ -255,23 +255,17 @@
 
                         <h4>Parâmetros de Idade para Iteração</h4>
                         <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="min_age" class="form-label">Idade Mínima (Gyr)</label>
                                 <input type="number" class="form-control" id="min_age" name="min_age"
                                        step="0.01" min="0.01" required value="0.01">
                                 <div class="form-text">Idade mínima para iniciar a iteração (em Gyr).</div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="max_age" class="form-label">Idade Máxima (Gyr)</label>
                                 <input type="number" class="form-control" id="max_age" name="max_age"
                                        step="0.1" min="0.1" required value="3.5">
                                 <div class="form-text">Idade máxima para a iteração (em Gyr). Por padrão, usa a idade da estrela.</div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="age_step" class="form-label">Passo de Idade (Gyr)</label>
-                                <input type="number" class="form-control" id="age_step" name="age_step"
-                                       step="0.01" min="0.01" required value="0.1">
-                                <div class="form-text">Intervalo entre cada idade na iteração (em Gyr).</div>
                             </div>
                         </div>
 
@@ -465,10 +459,6 @@
                             <tr>
                                 <td>Idade Máxima:</td>
                                 <td id="total_result_max_age"></td>
-                            </tr>
-                            <tr>
-                                <td>Passo de Idade:</td>
-                                <td id="total_result_age_step"></td>
                             </tr>
                         </table>
                     </div>

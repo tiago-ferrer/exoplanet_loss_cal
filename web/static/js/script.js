@@ -204,7 +204,6 @@ $(document).ready(function () {
         $('#total_result_fator_de_eficiencia').text(results.fator_de_eficiencia);
         $('#total_result_min_age').text(results.min_age + ' Gyr');
         $('#total_result_max_age').text(results.max_age + ' Gyr');
-        $('#total_result_age_step').text(results.age_step + ' Gyr');
 
         // Populate mass loss results
         $('#total_result_mass_loss_photoev').text(results.mass_loss_photoev);
@@ -229,7 +228,7 @@ $(document).ready(function () {
             const row = $('<tr>');
             row.append($('<td>').text(ages[i].toFixed(2)));
             row.append($('<td>').text(fx_values[i].toExponential(2)));
-            row.append($('<td>').text((temperatures[i] / 1e6).toFixed(2) + ' MK'));
+            row.append($('<td>').text((temperatures[i] / 1e6).toFixed(2)));
             row.append($('<td>').text((wind_velocities[i] / 1e5).toFixed(2)));
             row.append($('<td>').text(wind_densities[i].toExponential(2)));
             row.append($('<td>').text(photoevap_rates[i].toExponential(2)));

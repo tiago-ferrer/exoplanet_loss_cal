@@ -204,7 +204,8 @@ def calculate_total_mass_loss_route():
         efficiency_factor = float(request.form.get('efficiency_factor', 0.3))
         min_age = float(request.form.get('min_age', 0.01))
         max_age = float(request.form.get('max_age', star_data["t_gyr"]))
-        age_step = float(request.form.get('age_step', 0.1))
+        # Use a fixed age step value
+        age_step = 0.1
 
         # Constants
         Rsun = 6.957e10  # cm
@@ -254,7 +255,6 @@ def calculate_total_mass_loss_route():
             "fator_de_eficiencia": efficiency_factor,
             "min_age": min_age,
             "max_age": max_age,
-            "age_step": age_step,
             "mass_loss_photoev": f"{photoevap_mass_loss:.2e} g",
             "mass_loss_photoev_percent": f"{photoevap_mass_loss_percent:.2e} %",
             "mass_loss_wind": f"{wind_mass_loss:.2e} g",
