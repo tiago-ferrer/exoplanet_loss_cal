@@ -202,6 +202,7 @@ $(document).ready(function () {
 
         // Populate simulation parameters
         $('#total_result_fator_de_eficiencia').text(results.fator_de_eficiencia);
+        $('#total_result_velocidade_inicial').text(results.velocidade_inicial);
         $('#total_result_min_age').text(results.min_age + ' Gyr');
         $('#total_result_max_age').text(results.max_age + ' Gyr');
 

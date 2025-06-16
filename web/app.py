@@ -200,8 +200,9 @@ def calculate_total_mass_loss_route():
                 "Excentricidade": float(request.form.get('eccentricity'))
             }
 
-        # Get efficiency factor and age parameters from form data
+        # Get efficiency factor, initial velocity, and age parameters from form data
         efficiency_factor = float(request.form.get('efficiency_factor', 0.3))
+        initial_velocity = float(request.form.get('initial_velocity', 5)) * 1e3  # Convert from km/s to m/s
         min_age = float(request.form.get('min_age', 0.01))
         max_age = float(request.form.get('max_age', star_data["t_gyr"]))
         # Use a fixed age step value
@@ -233,6 +234,7 @@ def calculate_total_mass_loss_route():
             stellar_radius_cm=Restrela * Rsun,
             stellar_mass_kg=Mestrela * Msun,
             efficiency_factor=efficiency_factor,
+            initial_velocity=initial_velocity,
             min_age=min_age,
             max_age=max_age,
             age_step=age_step
@@ -253,6 +255,7 @@ def calculate_total_mass_loss_route():
             "planeta_excentricidade": planet_data["Excentricidade"],
             "idade_estrela": f"{star_data['t_gyr']} Gyr",
             "fator_de_eficiencia": efficiency_factor,
+            "velocidade_inicial": f"{initial_velocity / 1e3:.2f} km/s",
             "min_age": min_age,
             "max_age": max_age,
             "mass_loss_photoev": f"{photoevap_mass_loss:.2e} g",

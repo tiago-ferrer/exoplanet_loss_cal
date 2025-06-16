@@ -14,7 +14,7 @@
 <body>
 <div class="container mt-5">
     <div class="text-center mb-4">
-        <img src="{{ url_for('static', filename='imgs/logo.png') }}" alt="Perda de Massa de Exoplanetas" class="img-fluid custom-size">
+        <img src="{{ url_for('static', filename='imgs/logo-beta.png') }}" alt="Perda de Massa de Exoplanetas" class="img-fluid custom-size">
     </div>
 
     <div class="card">
@@ -242,13 +242,21 @@
 
                         <h4>Propriedades para Simulação</h4>
                         <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="total_efficiency_factor" class="form-label">Fator de Eficiência</label>
                                 <input type="number" class="form-control" id="total_efficiency_factor"
                                        name="efficiency_factor"
                                        step="0.01" min="0" max="1" required value="0.3">
                                 <div class="form-text">Valor entre 0 e 1 que representa a eficiência da
                                     fotoevaporação.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="total_initial_velocity" class="form-label">Velocidade Inicial Hipotética
+                                    (km/s)</label>
+                                <input type="number" class="form-control" id="total_initial_velocity" name="initial_velocity"
+                                       step="0.001" min="0" required value="5">
+                                <div class="form-text">Velocidade inicial hipotética para o cálculo do vento estelar.
                                 </div>
                             </div>
                         </div>
@@ -451,6 +459,10 @@
                             <tr>
                                 <td>Fator de eficiência:</td>
                                 <td id="total_result_fator_de_eficiencia"></td>
+                            </tr>
+                            <tr>
+                                <td>Velocidade Inicial Hipotética:</td>
+                                <td id="total_result_velocidade_inicial"></td>
                             </tr>
                             <tr>
                                 <td>Idade Mínima:</td>

@@ -41,7 +41,7 @@ class TotalMassLossCalculator:
     ])
     def __init__(self, planet_radius_cm, planet_mass_g, planet_orbital_distance_au, 
                  eccentricity, stellar_radius_cm, stellar_mass_kg, 
-                 efficiency_factor=0.3, min_age=0.01, max_age=None, age_step=0.1):
+                 efficiency_factor=0.3, initial_velocity=5e3, min_age=0.01, max_age=None, age_step=0.1):
         """
         Initialize the total mass loss calculator with custom age steps.
 
@@ -53,6 +53,7 @@ class TotalMassLossCalculator:
             stellar_radius_cm (float): Stellar radius in cm
             stellar_mass_kg (float): Stellar mass in kg
             efficiency_factor (float, optional): Efficiency factor for photoevaporation (0.25-1.0). Defaults to 0.3.
+            initial_velocity (float, optional): Initial guess velocity [m/s] for stellar wind calculation. Defaults to 5e3 m/s.
             min_age (float, optional): Minimum age in Gyr. Defaults to 0.01.
             max_age (float, optional): Maximum age in Gyr. If None, uses the default ages. Defaults to None.
             age_step (float, optional): Age step in Gyr. Defaults to 0.1.
@@ -65,6 +66,7 @@ class TotalMassLossCalculator:
         self.stellar_radius = stellar_radius_cm
         self.stellar_mass = stellar_mass_kg
         self.efficiency_factor = efficiency_factor
+        self.initial_velocity = initial_velocity
 
         # Use fixed age points within the specified range for consistent results
         if max_age is not None:
@@ -128,7 +130,7 @@ class TotalMassLossCalculator:
                 r_min_au=0.1,  # Start close to the star
                 r_max_au=self.planet_orbital_distance_au * 1.5,  # Go a bit beyond planet's orbit
                 Mstar=self.stellar_mass,
-                v_initial_at_start=5e3,  # Initial guess
+                v_initial_at_start=self.initial_velocity,  # Use the provided initial velocity
                 num_points=100
             )
 
@@ -195,7 +197,7 @@ class TotalMassLossCalculator:
 
 def calculate_total_mass_loss(planet_radius_cm, planet_mass_g, planet_orbital_distance_au, 
                              eccentricity, stellar_radius_cm, stellar_mass_kg, 
-                             efficiency_factor=0.3, min_age=0.01, max_age=None, age_step=0.1):
+                             efficiency_factor=0.3, initial_velocity=5e3, min_age=0.01, max_age=None, age_step=0.1):
     """
     Convenience function to calculate total mass loss with custom age steps.
 
@@ -221,6 +223,7 @@ def calculate_total_mass_loss(planet_radius_cm, planet_mass_g, planet_orbital_di
         stellar_radius_cm (float): Stellar radius in cm
         stellar_mass_kg (float): Stellar mass in kg
         efficiency_factor (float, optional): Efficiency factor for photoevaporation (0.25-1.0). Defaults to 0.3.
+        initial_velocity (float, optional): Initial guess velocity [m/s] for stellar wind calculation. Defaults to 5e3 m/s.
         min_age (float, optional): Minimum age in Gyr. Defaults to 0.01.
         max_age (float, optional): Maximum age in Gyr. If None, uses the default ages. Defaults to None.
         age_step (float, optional): Age step in Gyr. Defaults to 0.1.
@@ -236,6 +239,7 @@ def calculate_total_mass_loss(planet_radius_cm, planet_mass_g, planet_orbital_di
         stellar_radius_cm,
         stellar_mass_kg,
         efficiency_factor,
+        initial_velocity,
         min_age,
         max_age,
         age_step
