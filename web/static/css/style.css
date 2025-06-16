@@ -13,6 +13,10 @@ h1 {
     font-weight: 600;
 }
 
+.custom-size {
+    width: 400px;
+}
+
 .card {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
