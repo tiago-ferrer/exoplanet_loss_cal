@@ -3,6 +3,8 @@ from exoplanet_loss.calculators.lx_age_calculator import LxAgeFxCalculator
 from exoplanet_loss.calculators.photoevap_calculator import PhotoevaporationCalculator
 from exoplanet_loss.calculators.stellar_wind_velocity_by_distance import generate_velocity_vs_distance_data
 from exoplanet_loss.calculators.txc_mass_loss_stellar_wind import calcular_taxa_perda_de_massa_interacao_vento_solar
+from exoplanet_loss.calculators.stellar_wind_mass_loss_calculator import StellarWindMassLossCalculator
+from exoplanet_loss.calculators.photoevaporation_mass_loss_calculator import PhotoevaporationMassLossCalculator
 from exoplanet_loss.utils.logging import get_logger
 
 # Get logger for this module
@@ -62,8 +64,21 @@ def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3, initial_v
     photoEvp = PhotoevaporationCalculator(n, lx, RplanetaEarth * Rearth, MplanetaEarth * Mearth,
                                          EixoMaiorPlaneta * AU, Excentricidade)
     txmLossPhoto = photoEvp.get()
-    mLossPhoto = 0
-    mLossPhotoPercent = 0
+
+    # Calculate integrated photoevaporation mass loss over time
+    photoevap_mass_loss_calculator = PhotoevaporationMassLossCalculator(
+        planet_radius_cm=RplanetaEarth * Rearth,
+        planet_mass_g=MplanetaEarth * Mearth,
+        planet_orbital_distance_cm=EixoMaiorPlaneta * AU,
+        eccentricity=Excentricidade,
+        efficiency_factor=n
+    )
+
+    # Get total photoevaporation mass loss and additional data
+    mLossPhoto, photo_mass_loss_rates, photo_x_ray_luminosities = photoevap_mass_loss_calculator.calculate_mass_loss()
+
+    # Calculate percentage of planet mass lost due to photoevaporation
+    mLossPhotoPercent = (mLossPhoto / (MplanetaEarth * Mearth)) * 100
 
     # Calculate mass loss due to stellar wind
     d_w = rho_w(Restrela *AU/ Rsun, t_gyr)
@@ -75,13 +90,26 @@ def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3, initial_v
                                                                  Mstar=Mestrela*Msun, v_initial_at_start=initial_velocity,
                                                                  num_points=1000)
 
+    # Calculate instantaneous mass loss rate
     txmLossWind = calcular_taxa_perda_de_massa_interacao_vento_solar(RplanetaEarth * Rearth, d_w, veloc *1000)
-    mLossWind = 0
-    mLossWindPercent = 0
+
+    # Calculate integrated mass loss over time using the new calculator
+    wind_mass_loss_calculator = StellarWindMassLossCalculator(
+        planet_radius_cm=RplanetaEarth * Rearth,
+        planet_orbital_distance_au=EixoMaiorPlaneta,
+        stellar_radius_cm=Restrela * Rsun,
+        stellar_mass_kg=Mestrela * Msun
+    )
+
+    # Get total mass loss and additional data
+    mLossWind, mass_loss_rates, _, wind_velocities, wind_densities = wind_mass_loss_calculator.calculate_mass_loss()
+
+    # Calculate percentage of planet mass lost
+    mLossWindPercent = (mLossWind / (MplanetaEarth * Mearth)) * 100
 
     # Calculate total mass loss
     totalMassLoss = mLossWind + mLossPhoto
-    totalMassLossPercent = 0
+    totalMassLossPercent = (totalMassLoss / (MplanetaEarth * Mearth)) * 100
 
     # Generate density vs distance data for plotting
     # Convert AU to solar radii (1 AU = 215 Rsun)
@@ -118,6 +146,17 @@ def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3, initial_v
             "distance": EixoMaiorPlaneta,
             "distances": vel_distances,
             "velocities": velocities
+        },
+        "stellar_wind_mass_loss": {
+            "ages": wind_mass_loss_calculator.ages.tolist(),
+            "mass_loss_rates": mass_loss_rates.tolist(),
+            "wind_velocities": wind_velocities.tolist(),
+            "wind_densities": wind_densities.tolist()
+        },
+        "photoevaporation_mass_loss": {
+            "ages": photoevap_mass_loss_calculator.ages.tolist(),
+            "mass_loss_rates": photo_mass_loss_rates.tolist(),
+            "x_ray_luminosities": photo_x_ray_luminosities.tolist()
         }
     }
 
