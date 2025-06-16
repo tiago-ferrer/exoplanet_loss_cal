@@ -98,6 +98,11 @@ $(document).ready(function () {
         exportMassLossRatesChart();
     });
 
+    // Handle copy LaTeX table button click
+    $('#copyLatexTableBtn').on('click', function () {
+        copyTableAsLatex();
+    });
+
     // Function to submit form data
     function submitForm(form) {
         // Hide any previous results or errors
@@ -850,5 +855,94 @@ $(document).ready(function () {
             $btn.html(originalBtnText);
             $btn.prop('disabled', false);
         });
+    }
+
+    // Function to convert HTML table to LaTeX format and copy to clipboard
+    function copyTableAsLatex() {
+        // Get the table
+        const table = document.getElementById('detailedResultsTable');
+        if (!table) {
+            alert('Tabela não encontrada.');
+            return;
+        }
+
+        // Start building LaTeX table
+        let latexCode = '\\begin{table}[htbp]\n';
+        latexCode += '\\centering\n';
+        latexCode += '\\caption{Resultados Detalhados por Idade}\n';
+        latexCode += '\\begin{tabular}{';
+
+        // Add column specifications based on the number of columns
+        const headerRow = table.querySelector('thead tr');
+        if (!headerRow) {
+            alert('Cabeçalho da tabela não encontrado.');
+            return;
+        }
+
+        const numColumns = headerRow.cells.length;
+        for (let i = 0; i < numColumns; i++) {
+            latexCode += 'c';
+        }
+        latexCode += '}\n\\hline\n';
+
+        // Add header row
+        const headers = [];
+        for (let i = 0; i < headerRow.cells.length; i++) {
+            headers.push(headerRow.cells[i].textContent.trim());
+        }
+        latexCode += headers.join(' & ') + ' \\\\ \\hline\n';
+
+        // Add data rows
+        const tbody = table.querySelector('tbody');
+        if (!tbody) {
+            alert('Corpo da tabela não encontrado.');
+            return;
+        }
+
+        const rows = tbody.querySelectorAll('tr');
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].querySelectorAll('td');
+            const rowData = [];
+
+            for (let j = 0; j < cells.length; j++) {
+                rowData.push(cells[j].textContent.trim());
+            }
+
+            latexCode += rowData.join(' & ') + ' \\\\ \n';
+        }
+
+        // Close the LaTeX table
+        latexCode += '\\hline\n\\end{tabular}\n';
+        latexCode += '\\label{tab:detailed_results}\n';
+        latexCode += '\\end{table}';
+
+        // Copy to clipboard
+        try {
+            navigator.clipboard.writeText(latexCode).then(
+                function() {
+                    // Show success message
+                    alert('Tabela copiada para a área de transferência em formato LaTeX.');
+                }, 
+                function() {
+                    // Fallback for older browsers
+                    const textarea = document.createElement('textarea');
+                    textarea.value = latexCode;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('Tabela copiada para a área de transferência em formato LaTeX.');
+                }
+            );
+        } catch (err) {
+            // Fallback for browsers that don't support clipboard API
+            const textarea = document.createElement('textarea');
+            textarea.value = latexCode;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Tabela copiada para a área de transferência em formato LaTeX.');
+        }
     }
 });

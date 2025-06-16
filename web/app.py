@@ -260,7 +260,7 @@ def calculate_total_mass_loss_route():
             "mass_loss_wind": f"{wind_mass_loss:.2e} g",
             "mass_loss_wind_percent": f"{wind_mass_loss_percent:.2e} %",
             "total_mass_loss": f"{total_mass_loss:.2e} g",
-            "total_mass_loss_percent": f"{total_mass_loss_percent:.2e} %",
+            "total_mass_loss_percent": f"{total_mass_loss_percent:.2f} %",
             "results_data": results_data
         }
 
