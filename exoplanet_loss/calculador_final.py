@@ -85,7 +85,7 @@ def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3, initial_v
 
     # Generate velocity vs distance data for plotting
     r_min_au = 0.005  # Minimum radius in AU
-    vel_distances, velocities,veloc = generate_velocity_vs_distance_data(T_corona=t_cor, r_planeta_au=EixoMaiorPlaneta,
+    vel_distances, velocities, veloc, final_initial_velocity = generate_velocity_vs_distance_data(T_corona=t_cor, r_planeta_au=EixoMaiorPlaneta,
                                                                  r_min_au=r_min_au, r_max_au=(EixoMaiorPlaneta*4),
                                                                  Mstar=Mestrela*Msun, v_initial_at_start=initial_velocity,
                                                                  num_points=1000)
@@ -121,7 +121,7 @@ def calculate_mass_loss(star_data, planet_data, efficiency_factor=0.3, initial_v
     return {
         "idade_estrela": t_gyr,
         "fator_de_eficiencia": n,
-        "velocidade_inicial": initial_velocity,
+        "velocidade_inicial": final_initial_velocity,
         "lx": lx,
         "t_cor": t_cor,
         "fx":fx,

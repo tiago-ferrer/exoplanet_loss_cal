@@ -138,7 +138,7 @@ def calculate():
             "densidade_vento_estelar": f"{results['densidade_vento_estelar']:.2e} g/s",
             "idade_estrela": f"{results['idade_estrela']} Gyr",
             "fator_de_eficiencia": results["fator_de_eficiencia"],
-            "velocidade_inicial": f"{results['velocidade_inicial'] / 1000} km/s"
+            "velocidade_inicial": f"{(results['velocidade_inicial'] / 1000):.2f} km/s"
         }
 
         return jsonify({"success": True, "results": formatted_results})
