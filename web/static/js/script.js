@@ -68,6 +68,9 @@ $(document).ready(function () {
                     // Set max_age to stellar age
                     $('#max_age').val(data.t_gyr);
 
+                    // Turn off the API switch after fetching data
+                    $('#useApiForTotalMassLoss').prop('checked', false).trigger('change');
+
                     alert('Dados carregados com sucesso!');
                 } else {
                     alert('Erro ao buscar dados: ' + response.error);
